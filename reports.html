@@ -41,6 +41,11 @@
         </div>
         <div class="audit-help">بعد إضافة الصورة استخدم أزرار التكبير والتصغير، ويمكنك سحب الصورة بالماوس لتحريكها.</div>
 
+        <div class="ocr-tools" aria-label="استخراج الوحدات من صورة التقرير">
+          <button id="extractUnitsBtn" class="primary" type="button">استخراج الوحدات من الصورة</button>
+          <div id="ocrStatus" class="audit-help ocr-status">ارفع صورة واضحة ثم اضغط استخراج الوحدات. سيتم تعبئة خانات لوس، ساندي، بوليتو، وجزيرة بوليتو تلقائياً قدر الإمكان.</div>
+        </div>
+
         <div class="audit-preview" aria-live="polite">
           <img id="auditPreview" class="hidden" alt="معاينة صورة التقرير" />
           <div id="auditPlaceholder" class="image-placeholder">لم يتم اختيار صورة بعد</div>
@@ -80,58 +85,60 @@
       </div>
 
       <h2>الإدارة والإشراف</h2>
+      <p class="section-note">يمكنك وضع Copy ID الخاص بالديسكورد مباشرة، وسيتم تحويله تلقائياً إلى منشن مثل &lt;@457775919122087936&gt;.</p>
       <div class="grid two">
         <div class="field">
           <label for="garageLeader">قيادة الكراج</label>
-          <textarea id="garageLeader" rows="2" placeholder="مثال: &lt;@457775919122087936&gt;"></textarea>
+          <textarea id="garageLeader" rows="2" placeholder="ضع Copy ID مثل 457775919122087936 وسيتم تحويله إلى &lt;@...&gt;"></textarea>
         </div>
 
         <div class="field">
           <label for="advisor">مستشار القائد</label>
-          <textarea id="advisor" rows="2" placeholder="منشن المستشار"></textarea>
+          <textarea id="advisor" rows="2" placeholder="ضع Copy ID أو منشن المستشار"></textarea>
         </div>
 
         <div class="field">
           <label for="generalSupervisor">المشرف العام</label>
-          <textarea id="generalSupervisor" rows="2" placeholder="منشن المشرف العام"></textarea>
+          <textarea id="generalSupervisor" rows="2" placeholder="ضع Copy ID أو منشن المشرف العام"></textarea>
         </div>
 
         <div class="field">
           <label for="fieldSupervisor">المشرف الميداني</label>
-          <textarea id="fieldSupervisor" rows="2" placeholder="منشن المشرف الميداني"></textarea>
+          <textarea id="fieldSupervisor" rows="2" placeholder="ضع Copy ID أو منشن المشرف الميداني"></textarea>
         </div>
 
         <div class="field">
           <label for="areaSupervisors">مشرفين المناطق</label>
-          <textarea id="areaSupervisors" rows="2" placeholder="منشن مشرفين المناطق"></textarea>
+          <textarea id="areaSupervisors" rows="2" placeholder="ضع Copy ID أو منشن مشرفين المناطق"></textarea>
         </div>
 
         <div class="field">
           <label for="traineeSupervisors">مشرفين متدربين</label>
-          <textarea id="traineeSupervisors" rows="2" placeholder="لا يوجد"></textarea>
+          <textarea id="traineeSupervisors" rows="2" placeholder="ضع Copy ID أو اكتب لا يوجد"></textarea>
         </div>
       </div>
 
       <h2>العمليات والاتصالات</h2>
+      <p class="section-note">يمكنك وضع Copy ID في خانات العمليات والاتصالات والسيدات والمعتمدين، وسيتم تحويله تلقائياً إلى منشن. كما يمكن وضع Copy ID في خانات ميناء لوس وميناء بوليتو.</p>
       <div class="grid two">
         <div class="field">
           <label for="operations">العمليات</label>
-          <textarea id="operations" rows="2" placeholder="منشن العمليات"></textarea>
+          <textarea id="operations" rows="2" placeholder="ضع Copy ID أو منشن العمليات"></textarea>
         </div>
 
         <div class="field">
           <label for="deputyOperations">نائب العمليات</label>
-          <textarea id="deputyOperations" rows="2" placeholder="منشن نائب العمليات"></textarea>
+          <textarea id="deputyOperations" rows="2" placeholder="ضع Copy ID أو منشن نائب العمليات"></textarea>
         </div>
 
         <div class="field">
           <label for="callCenter">مركز الاتصالات</label>
-          <textarea id="callCenter" rows="2" placeholder="منشن مركز الاتصالات"></textarea>
+          <textarea id="callCenter" rows="2" placeholder="ضع Copy ID أو منشن مركز الاتصالات"></textarea>
         </div>
 
         <div class="field">
           <label for="ladiesCertified">السيدات و المعتمدين</label>
-          <textarea id="ladiesCertified" rows="2" placeholder="اتركها فاضية أو اكتب لا يوجد"></textarea>
+          <textarea id="ladiesCertified" rows="2" placeholder="ضع Copy ID أو منشن، أو اتركها فاضية"></textarea>
         </div>
       </div>
 
@@ -167,12 +174,12 @@
 
         <div class="field">
           <label for="losPort">ميناء لوس</label>
-          <textarea id="losPort" rows="2" placeholder="لا يوجد"></textarea>
+          <textarea id="losPort" rows="2" placeholder="ضع Copy ID أو منشن فني ميناء لوس، أو اكتب لا يوجد"></textarea>
         </div>
 
         <div class="field">
           <label for="paletoPort">ميناء بوليتو</label>
-          <textarea id="paletoPort" rows="2" placeholder="لا يوجد"></textarea>
+          <textarea id="paletoPort" rows="2" placeholder="ضع Copy ID أو منشن فني ميناء بوليتو، أو اكتب لا يوجد"></textarea>
         </div>
       </div>
 
@@ -192,6 +199,7 @@
   </main>
 
   <div id="toast" role="status" aria-live="polite"></div>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@latest/dist/tesseract.min.js"></script>
   <script src="report.js"></script>
 </body>
 </html>

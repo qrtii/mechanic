@@ -55,6 +55,67 @@ function value(input, fallback = 'لا يوجد') {
   return text.length ? text : fallback;
 }
 
+
+function normalizeDigits(text) {
+  const map = {
+    '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4',
+    '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9',
+    '۰': '0', '۱': '1', '۲': '2', '۳': '3', '۴': '4',
+    '۵': '5', '۶': '6', '۷': '7', '۸': '8', '۹': '9'
+  };
+  return String(text || '').replace(/[٠-٩۰-۹]/g, (digit) => map[digit] || digit);
+}
+
+function convertDiscordIdsToMentions(text) {
+  const placeholders = [];
+  let working = normalizeDigits(String(text || ''));
+
+  // لا نغيّر المنشنات الجاهزة سواء كانت منشن شخص أو رتبة.
+  working = working.replace(/<@&?!?\d{15,25}>|<@!?\d{15,25}>/g, (mention) => {
+    const token = `__MENTION_${placeholders.length}__`;
+    placeholders.push(mention);
+    return token;
+  });
+
+  // أي Copy ID رقمي يتم تحويله تلقائياً إلى منشن ديسكورد.
+  working = working.replace(/\b\d{15,25}\b/g, (id) => `<@${id}>`);
+
+  placeholders.forEach((mention, index) => {
+    working = working.replace(`__MENTION_${index}__`, mention);
+  });
+
+  return working.trim();
+}
+
+function formatMentionField(input) {
+  if (!input) return;
+  input.value = convertDiscordIdsToMentions(input.value);
+}
+
+const supervisionMentionFields = [
+  fields.leadership,
+  fields.leaderAdvisor,
+  fields.generalSupervision,
+  fields.fieldSupervision,
+  fields.areaSupervision,
+  fields.traineeSupervision,
+  fields.certifiedLadies,
+  fields.storeOpeningOfficer,
+  fields.garageRoomFieldSupervisor,
+  fields.garageRoomAreaSupervisor,
+  fields.garageRoomTraineeSupervisor,
+  fields.operations,
+  fields.deputyOperations,
+  fields.callCenter,
+  fields.losPort,
+  fields.paletoPort,
+  fields.searchRescue
+];
+
+function formatSupervisionMentions() {
+  supervisionMentionFields.forEach(formatMentionField);
+}
+
 function inBrackets(text) {
   const clean = String(text || '').trim();
   if (clean.startsWith('(') && clean.endsWith(')')) return clean;
@@ -74,6 +135,7 @@ function toast(message) {
 }
 
 function buildSupervisionReport() {
+  formatSupervisionMentions();
   const reportNumber = value(fields.reportNumber, '00');
   const fromTime = value(fields.fromTime, '00:00');
   const fromPeriod = value(fields.fromPeriod, 'ص');

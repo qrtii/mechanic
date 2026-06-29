@@ -495,3 +495,25 @@ textarea:focus {
     position: static;
   }
 }
+
+
+.ocr-tools {
+  margin: 12px 0 14px;
+}
+
+.ocr-tools button {
+  width: 100%;
+  min-height: 50px;
+}
+
+.ocr-status {
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+.section-note {
+  margin: -0.35rem 0 1rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
