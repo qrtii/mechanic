@@ -71,6 +71,57 @@ function normalizeArabicNumbers(text) {
     .replace(/[۰-۹]/g, (digit) => '۰۱۲۳۴۵۶۷۸۹'.indexOf(digit));
 }
 
+
+function convertDiscordIdsToMentions(text) {
+  const placeholders = [];
+  let working = normalizeArabicNumbers(String(text || ''));
+
+  working = working.replace(/<@&?!?\d{15,25}>|<@!?\d{15,25}>/g, (mention) => {
+    const token = `__MENTION_${placeholders.length}__`;
+    placeholders.push(mention);
+    return token;
+  });
+
+  working = working.replace(/\b\d{15,25}\b/g, (id) => `<@${id}>`);
+
+  placeholders.forEach((mention, index) => {
+    working = working.replace(`__MENTION_${index}__`, mention);
+  });
+
+  return working.trim();
+}
+
+function formatMentionField(input) {
+  if (!input) return;
+  const before = input.value;
+  const after = convertDiscordIdsToMentions(before);
+  if (after !== before) {
+    input.value = after;
+  }
+}
+
+function scheduleMentionFieldFormat(input) {
+  if (!input) return;
+  window.clearTimeout(input.autoMentionTimer);
+  input.autoMentionTimer = window.setTimeout(() => {
+    const text = normalizeArabicNumbers(input.value);
+    // عند لصق أو كتابة Copy ID كامل، يظهر المنشن داخل الخانة نفسها مباشرة.
+    if (/\b\d{17,25}\b/.test(text)) {
+      formatMentionField(input);
+    }
+  }, 120);
+}
+
+const adminAutoMentionFields = [
+  leaveFields.technician,
+  leaveFields.signature,
+  assignmentFields.mention
+];
+
+function formatAdminAutoMentions() {
+  adminAutoMentionFields.forEach(formatMentionField);
+}
+
 function parseHours(text) {
   const clean = normalizeArabicNumbers(text).trim();
   if (!clean) return null;
@@ -146,7 +197,7 @@ function toggleLeaveUi() {
   const merchant = isMerchantLeave();
   const reward = isLeadershipReward();
   leaveFields.personLabel.textContent = merchant ? 'التاجر المحترم' : 'الفني المحترم';
-  leaveFields.technician.placeholder = 'مثال: <@943708520648433674>';
+  leaveFields.technician.placeholder = 'ضع Copy ID هنا وسيظهر كمنشن تلقائياً';
   leaveUi.balanceFields.forEach((el) => el.classList.toggle('hidden', merchant || reward));
   leaveUi.notesTitle?.classList.toggle('hidden', merchant || reward);
   leaveUi.notesGroup?.classList.toggle('hidden', merchant || reward);
@@ -266,6 +317,7 @@ function buildAssignmentReport() {
 }
 
 function buildReport() {
+  formatAdminAutoMentions();
   return currentSection() === 'assignment' ? buildAssignmentReport() : buildLeaveReport();
 }
 
@@ -362,6 +414,15 @@ typeSelect.addEventListener('change', updateVisibleForm);
 
 leaveFields.duration.addEventListener('input', calculateRemainingBalance);
 leaveFields.remaining.addEventListener('input', calculateRemainingBalance);
+
+adminAutoMentionFields.forEach((input) => {
+  input.addEventListener('input', () => scheduleMentionFieldFormat(input));
+  input.addEventListener('change', () => formatMentionField(input));
+  input.addEventListener('blur', () => formatMentionField(input));
+  input.addEventListener('paste', () => {
+    window.setTimeout(() => formatMentionField(input), 0);
+  });
+});
 
 ensureLeaveRulesLink();
 ensureLeaveNotes();

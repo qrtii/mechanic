@@ -517,3 +517,15 @@ textarea:focus {
   font-size: 0.95rem;
   line-height: 1.8;
 }
+
+/* حقول المنشن: اكتب Copy ID وسيتحول داخل الخانة نفسها */
+.mention-input {
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: plaintext;
+}
+
+.mention-input::placeholder {
+  direction: rtl;
+  text-align: right;
+}
