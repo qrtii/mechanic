@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>توجيهات الميدان | كراج الميكانيك</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="page-shell">
+    <nav class="top-nav card" aria-label="التنقل بين صفحات الموقع">
+      <a class="active" href="index.html">توجيهات الميدان</a>
+      <a href="reports.html">التقارير الميدانية</a>
+      <a href="supervision.html">تقارير الاشراف</a>
+      <a href="admin.html">شؤون إدارية</a>
+    </nav>
+
+    <section class="hero card">
+      <div class="badge">كراج الميكانيك</div>
+      <h1>توجيهات الميدان</h1>
+      <p>اختر الموقع والاسم والكود، ثم اضغط إظهار الاسم للحصول على النص جاهزاً للنسخ.</p>
+    </section>
+
+    <section class="card form-card" aria-label="نموذج المسمى الميداني">
+      <div class="field">
+        <label for="rank">الموقع / المسمى الميداني</label>
+        <select id="rank" required>
+          <option value="">اختر المسمى</option>
+          <option>اشراف عام</option>
+          <option>اشراف ميداني</option>
+          <option>اشراف منطقة لوس</option>
+          <option>اشراف منطقة ساندي</option>
+          <option>اشراف منطقة بوليتو</option>
+          <option>لوس</option>
+          <option>ساندي</option>
+          <option>بوليتو</option>
+          <option>الجزيرة</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="company">الاسم</label>
+        <select id="company">
+          <option value="">اختر الاسم</option>
+          <option>سعيد البدواوي</option>
+          <option>محمد بن فاضل</option>
+          </select>
+      </div>
+
+      <div class="field">
+        <label for="certified">لاعب معتمد <span>(اختياري)</span></label>
+        <select id="certified">
+          <option value="">بدون</option>
+          <option>CD</option>
+          <option>CC</option>
+          <option>CB</option>
+          <option>CA</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="playerName">الكود <span>(اختياري)</span></label>
+        <select id="playerName">
+          <option value="">بدون كود</option>
+          <option>G-163</option>
+          <option>G-073</option>
+        </select>
+      </div>
+
+      <div class="button-row">
+        <button id="showBtn" class="primary" type="button">اضغط هنا لإظهار اسمك ✒️</button>
+        <button id="copyBtn" class="secondary" type="button">اضغط هنا للنسخ</button>
+      </div>
+
+      <div id="resultBox" class="result" aria-live="polite">
+        سيظهر النص هنا بعد الاختيار.
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="script.js"></script>
+</body>
+</html>

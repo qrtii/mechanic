@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تقارير الاشراف | كراج الميكانيكي</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="page-shell wide">
+    <nav class="top-nav card" aria-label="التنقل بين صفحات الموقع">
+      <a href="index.html">توجيهات الميدان</a>
+      <a href="reports.html">التقارير الميدانية</a>
+      <a class="active" href="supervision.html">تقارير الاشراف</a>
+      <a href="admin.html">شؤون إدارية</a>
+    </nav>
+
+    <section class="hero card">
+      <div class="badge">كراج الميكانيكي</div>
+      <h1>تقارير الاشراف</h1>
+      <p>عبّئ بيانات تقرير المشرفين ثم اضغط إنشاء التقرير، وبعدها انسخ التقرير جاهز للديسكورد.</p>
+    </section>
+
+    <div class="report-layout has-audit-panel">
+      <aside class="card audit-panel" aria-label="إضافة صورة للتدقيق">
+        <h2>صورة التدقيق</h2>
+        <p>أضف صورة التقرير هنا للمراجعة بجانب الخانات. يمكنك تكبيرها، تصغيرها، وسحبها بالماوس للتحريك. الصورة للمعاينة فقط ولا تدخل في نص التقرير أو النسخ.</p>
+
+        <div class="field">
+          <label for="auditImage">إضافة صورة</label>
+          <input id="auditImage" type="file" accept="image/*" />
+        </div>
+
+        <div class="audit-preview" aria-live="polite">
+          <img id="auditPreview" class="hidden" alt="معاينة صورة التقرير" />
+          <div id="auditPlaceholder" class="image-placeholder">لم يتم اختيار صورة بعد</div>
+        </div>
+
+        <div class="audit-actions">
+          <button id="zoomInAuditImageBtn" class="secondary" type="button">تكبير +</button>
+          <button id="zoomOutAuditImageBtn" class="secondary" type="button">تصغير -</button>
+          <button id="clearAuditImageBtn" class="danger" type="button">حذف الصورة</button>
+        </div>
+      </aside>
+
+      <section class="card report-card" aria-label="نموذج تقارير الاشراف">
+      <h2>بيانات التقرير</h2>
+      <div class="grid three">
+        <div class="field">
+          <label for="superReportNumber">تقرير رقم</label>
+          <input id="superReportNumber" type="text" value="00" placeholder="00" />
+        </div>
+
+        <div class="field">
+          <label for="superFromTime">من الساعة</label>
+          <div class="inline">
+            <input id="superFromTime" type="text" value="00:00" placeholder="00:00" />
+            <select id="superFromPeriod" aria-label="الفترة من">
+              <option>ص</option>
+              <option>م</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="superToTime">إلى الساعة</label>
+          <div class="inline">
+            <input id="superToTime" type="text" value="00:00" placeholder="00:00" />
+            <select id="superToPeriod" aria-label="الفترة إلى">
+              <option>ص</option>
+              <option>م</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <h2>القيادة</h2>
+      <div class="grid two">
+        <div class="field">
+          <label for="leadership">القيادة</label>
+          <textarea id="leadership" rows="2" placeholder="منشن للقيادة"></textarea>
+        </div>
+        <div class="field">
+          <label for="leaderAdvisor">مستشار القائد</label>
+          <textarea id="leaderAdvisor" rows="2" placeholder="منشن للمستشار"></textarea>
+        </div>
+      </div>
+
+      <h2>الإشراف</h2>
+      <div class="grid two">
+        <div class="field">
+          <label for="generalSupervision">اشراف عام</label>
+          <textarea id="generalSupervision" rows="2" placeholder="منشن للمشرف"></textarea>
+        </div>
+        <div class="field">
+          <label for="fieldSupervision">اشراف ميداني</label>
+          <textarea id="fieldSupervision" rows="2" placeholder="منشن للمشرف"></textarea>
+        </div>
+        <div class="field">
+          <label for="areaSupervision">اشراف المناطق</label>
+          <textarea id="areaSupervision" rows="2" placeholder="منشن للمشرف"></textarea>
+        </div>
+        <div class="field">
+          <label for="traineeSupervision">مشرفين متدربين</label>
+          <textarea id="traineeSupervision" rows="2" placeholder="منشن للمشرف"></textarea>
+        </div>
+        <div class="field">
+          <label for="certifiedLadies">لاعب معتمد</label>
+          <textarea id="certifiedLadies" rows="2" placeholder="منشن للمعتمد"></textarea>
+        </div>
+      </div>
+
+      <h2>المتجر وبروم الكراج</h2>
+      <div class="grid two">
+        <div class="field">
+          <label for="storeOpeningOfficer">مسؤول افتتاح المتجر</label>
+          <textarea id="storeOpeningOfficer" rows="2" placeholder="منشن للمشرف"></textarea>
+        </div>
+        <div class="field">
+          <label for="garageRoomFieldSupervisor">المشرف الميداني بروم الكراج</label>
+          <textarea id="garageRoomFieldSupervisor" rows="2" placeholder="منشن للمشرف"></textarea>
+        </div>
+        <div class="field">
+          <label for="garageRoomAreaSupervisor">مشرف المنطقة بروم الكراج</label>
+          <textarea id="garageRoomAreaSupervisor" rows="2" placeholder="منشن للمشرف"></textarea>
+        </div>
+        <div class="field">
+          <label for="garageRoomTraineeSupervisor">مشرف المتدرب بروم الكراج</label>
+          <textarea id="garageRoomTraineeSupervisor" rows="2" placeholder="منشن للمشرف"></textarea>
+        </div>
+      </div>
+
+      <h2>العمليات والفنيين</h2>
+      <div class="grid two">
+        <div class="field">
+          <label for="superOperations">العمليات</label>
+          <textarea id="superOperations" rows="2" placeholder="منشن للفني"></textarea>
+        </div>
+        <div class="field">
+          <label for="superDeputyOperations">نائب العمليات</label>
+          <textarea id="superDeputyOperations" rows="2" placeholder="منشن للفني"></textarea>
+        </div>
+        <div class="field">
+          <label for="superCallCenter">مركز الإتصالات</label>
+          <textarea id="superCallCenter" rows="2" placeholder="منشن للفني"></textarea>
+        </div>
+        <div class="field">
+          <label for="superLosPort">فني ميناء لوس</label>
+          <textarea id="superLosPort" rows="2" placeholder="منشن للفني"></textarea>
+        </div>
+        <div class="field">
+          <label for="superPaletoPort">فني ميناء بوليتو</label>
+          <textarea id="superPaletoPort" rows="2" placeholder="منشن للفني"></textarea>
+        </div>
+        <div class="field">
+          <label for="searchRescue">البحث والانقاذ</label>
+          <textarea id="searchRescue" rows="2" placeholder="منشن للفني"></textarea>
+        </div>
+      </div>
+
+      <h2>روابط التقرير</h2>
+      <div class="grid two">
+        <div class="field">
+          <label for="supervisionSubmitLink">رابط تسليم تقرير الاشراف</label>
+          <input id="supervisionSubmitLink" type="text" value="" placeholder="ضع الرابط هنا" />
+        </div>
+        <div class="field">
+          <label for="operationsReportLink">رابط تقرير العمليات</label>
+          <input id="operationsReportLink" type="text" value="" placeholder="ضع الرابط هنا" />
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button id="generateSupervisionBtn" class="primary" type="button">إنشاء تقرير الإشراف</button>
+        <button id="copySupervisionBtn" class="secondary" type="button">نسخ التقرير</button>
+        <button id="exampleSupervisionBtn" class="ghost" type="button">تعبئة مثال</button>
+        <button id="clearSupervisionBtn" class="danger" type="button">مسح الخانات</button>
+      </div>
+
+      <div class="field result-wrap">
+        <label for="supervisionOutput">تقرير الإشراف النهائي</label>
+        <textarea id="supervisionOutput" class="report-output" rows="25" readonly>سيظهر تقرير الإشراف هنا بعد الضغط على إنشاء التقرير.</textarea>
+      </div>
+    </section>
+    </div>
+  </main>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="supervision.js"></script>
+</body>
+</html>

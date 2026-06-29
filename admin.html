@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>شؤون إدارية | كراج الميكانيكي</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="page-shell wide">
+    <nav class="top-nav card" aria-label="التنقل بين صفحات الموقع">
+      <a href="index.html">توجيهات الميدان</a>
+      <a href="reports.html">التقارير الميدانية</a>
+      <a href="supervision.html">تقارير الاشراف</a>
+      <a class="active" href="admin.html">شؤون إدارية</a>
+    </nav>
+
+    <section class="hero card">
+      <div class="badge">كراج الميكانيكي</div>
+      <h1>شؤون إدارية</h1>
+      <p>اختر نوع التقرير الإداري، عبّئ البيانات، ثم انسخ النص جاهز للديسكورد.</p>
+    </section>
+
+    <section class="card report-card" aria-label="نماذج الشؤون الإدارية">
+      <h2>نوع التقرير</h2>
+      <div class="grid two">
+        <div class="field">
+          <label for="adminReportType">اختر النموذج</label>
+          <select id="adminReportType">
+            <option value="internalLeave">إجازة داخلية</option>
+            <option value="externalLeave">إجازة خارجية</option>
+            <option value="merchantLeave">إجازة تاجر</option>
+            <option value="leadershipReward">مكافأة قيادية</option>
+            <option value="externalAssignment">انتداب خارجي</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>ملاحظة</label>
+          <input type="text" value="يمكنك تعبئة مثال ثم تعديل البيانات" readonly />
+        </div>
+      </div>
+
+      <div id="leaveForm" class="admin-form">
+        <h2>بيانات الإجازة</h2>
+        <div class="grid two">
+          <div class="field">
+            <label id="leavePersonLabel" for="leaveTechnician">الفني المحترم</label>
+            <textarea id="leaveTechnician" rows="2" placeholder="مثال: <@943708520648433674>"></textarea>
+          </div>
+          <div class="field">
+            <label for="leaveDuration">مدة الإجازة</label>
+            <input id="leaveDuration" type="text" placeholder="مثال: 3 ساعة" />
+          </div>
+          <div class="field leave-balance-field">
+            <label for="leaveRemaining">الرصيد الحالي قبل الخصم</label>
+            <input id="leaveRemaining" type="text" placeholder="مثال: 19 ساعة" />
+          </div>
+          <div class="field leave-balance-field">
+            <label for="leaveCalculatedRemaining">الرصيد المتبقي بعد الخصم</label>
+            <input id="leaveCalculatedRemaining" type="text" placeholder="يتم حسابه تلقائياً" readonly />
+          </div>
+        </div>
+
+        <h2>وقت الإجازة</h2>
+        <div class="grid two">
+          <div class="field">
+            <label>من تاريخ</label>
+            <div class="inline date-time">
+              <input id="leaveFromDate" type="date" aria-label="تاريخ بداية الإجازة" />
+              <input id="leaveFromTime" type="time" aria-label="وقت بداية الإجازة" />
+              <select id="leaveFromPeriod" aria-label="فترة البداية">
+                <option>ص</option>
+                <option>م</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>الى تاريخ</label>
+            <div class="inline date-time">
+              <input id="leaveToDate" type="date" aria-label="تاريخ نهاية الإجازة" />
+              <input id="leaveToTime" type="time" aria-label="وقت نهاية الإجازة" />
+              <select id="leaveToPeriod" aria-label="فترة النهاية">
+                <option>ص</option>
+                <option>م</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <h2>رابط القوانين</h2>
+        <div class="grid one">
+          <div class="field">
+            <label for="leaveRulesLink">رابط قوانين الإجازات</label>
+            <input id="leaveRulesLink" type="text" value="https://discord.com/channels/1071933157097615480/1071934713524133918/1500101205320536155" placeholder="ضع رابط القوانين هنا" />
+          </div>
+        </div>
+
+        <h2 class="leave-notes-title">الملاحظات</h2>
+        <div class="grid one leave-notes-group">
+          <div class="field">
+            <label for="leaveNotes">الملاحظات</label>
+            <textarea id="leaveNotes" rows="3">يلزم الفني اكمال 24 ساعة من اخر اجازة و التأكد من المخالفات و تصفير الاجازات</textarea>
+          </div>
+        </div>
+
+        <h2>منشن الرتبة / القسم</h2>
+        <div class="grid one">
+          <div class="field">
+            <label for="leaveRoleMention">منشن الرتبة / القسم</label>
+            <input id="leaveRoleMention" type="text" value="<@&1149742928953086105>" placeholder="مثال: <@&1149742928953086105>" />
+          </div>
+        </div>
+
+        <h2 class="reward-signature-title hidden">توقيع و اعتماد</h2>
+        <div class="grid one reward-signature-group hidden">
+          <div class="field">
+            <label for="rewardSignature">توقيع و اعتماد</label>
+            <textarea id="rewardSignature" rows="2" placeholder="اكتب منشن أو اسم المعتمد"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div id="assignmentForm" class="admin-form hidden">
+        <h2>بيانات الانتداب الخارجي</h2>
+        <div class="grid two">
+          <div class="field">
+            <label for="assignmentMention">الاسم / منشن الموظف</label>
+            <textarea id="assignmentMention" rows="2" placeholder="مثال: <@481603641158139924>"></textarea>
+          </div>
+          <div class="field">
+            <label for="assignmentEmployee">كود واسم الموظف</label>
+            <textarea id="assignmentEmployee" rows="2" placeholder="مثال: [CD| G-163] سعيد البدواوي"></textarea>
+          </div>
+          <div class="field">
+            <label for="assignmentSector">القطاع المنتدب له</label>
+            <select id="assignmentSector">
+              <option value="">اختر القطاع</option>
+              <option>شرطة لوس</option>
+              <option>شرطة بوليتو</option>
+              <option>شرطة موانئ لوس</option>
+              <option>ادارة الشرطة</option>
+              <option>ادارة الشيرف</option>
+              <option>الهلال الاحمر</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="assignmentDuration">المدة</label>
+            <select id="assignmentDuration">
+              <option value="">اختر المدة</option>
+              <option>يومين</option>
+              <option>3 أيام</option>
+              <option>4 أيام</option>
+              <option>5 أيام</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="button-row">
+        <button id="generateAdminBtn" class="primary" type="button">إنشاء التقرير</button>
+        <button id="copyAdminBtn" class="secondary" type="button">نسخ التقرير</button>
+        <button id="exampleAdminBtn" class="ghost" type="button">تعبئة مثال</button>
+        <button id="clearAdminBtn" class="danger" type="button">مسح الخانات</button>
+      </div>
+
+      <div class="field result-wrap">
+        <label for="adminOutput">النص النهائي</label>
+        <textarea id="adminOutput" class="report-output" rows="22" readonly>سيظهر التقرير الإداري هنا بعد الضغط على إنشاء التقرير.</textarea>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="admin.js"></script>
+</body>
+</html>

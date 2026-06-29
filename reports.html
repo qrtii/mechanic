@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>التقارير الميدانية | كراج الميكانيكي</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="page-shell wide">
+    <nav class="top-nav card" aria-label="التنقل بين صفحات الموقع">
+      <a href="index.html">توجيهات الميدان</a>
+      <a class="active" href="reports.html">التقارير الميدانية</a>
+      <a href="supervision.html">تقارير الاشراف</a>
+      <a href="admin.html">شؤون إدارية</a>
+    </nav>
+
+    <section class="hero card">
+      <div class="badge">كراج الميكانيكي</div>
+      <h1>التقارير الميدانية</h1>
+      <p>عبّئ البيانات ثم اضغط إنشاء التقرير، وبعدها انسخ التقرير جاهز للديسكورد.</p>
+    </section>
+
+    <div class="report-layout has-audit-panel">
+      <aside class="card audit-panel" aria-label="إضافة صورة للتدقيق">
+        <h2>صورة التدقيق</h2>
+        <p>أضف صورة التقرير هنا للمراجعة بجانب الخانات. يمكنك تكبيرها، تصغيرها، وسحبها بالماوس للتحريك. الصورة للمعاينة فقط ولا تدخل في نص التقرير أو النسخ.</p>
+
+        <div class="field">
+          <label for="auditImage">إضافة صورة</label>
+          <input id="auditImage" type="file" accept="image/*" />
+        </div>
+
+        <div class="audit-preview" aria-live="polite">
+          <img id="auditPreview" class="hidden" alt="معاينة صورة التقرير" />
+          <div id="auditPlaceholder" class="image-placeholder">لم يتم اختيار صورة بعد</div>
+        </div>
+
+        <div class="audit-actions">
+          <button id="zoomInAuditImageBtn" class="secondary" type="button">تكبير +</button>
+          <button id="zoomOutAuditImageBtn" class="secondary" type="button">تصغير -</button>
+          <button id="clearAuditImageBtn" class="danger" type="button">حذف الصورة</button>
+        </div>
+      </aside>
+
+      <section class="card report-card" aria-label="نموذج التقرير الميداني">
+      <h2>بيانات التقرير</h2>
+
+      <div class="grid three">
+        <div class="field">
+          <label for="reportNumber">تقرير رقم</label>
+          <input id="reportNumber" type="text" placeholder="مثال: 1" />
+        </div>
+
+        <div class="field">
+          <label for="fromTime">من الساعة</label>
+          <div class="inline">
+            <input id="fromTime" type="text" value="7:00" placeholder="7:00" />
+            <select id="fromPeriod" aria-label="الفترة من">
+              <option>ص</option>
+              <option>م</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="toTime">حتى الساعة</label>
+          <div class="inline">
+            <input id="toTime" type="text" value="8:00" placeholder="8:00" />
+            <select id="toPeriod" aria-label="الفترة حتى">
+              <option>ص</option>
+              <option>م</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <h2>الإدارة والإشراف</h2>
+      <div class="grid two">
+        <div class="field">
+          <label for="garageLeader">قيادة الكراج</label>
+          <textarea id="garageLeader" rows="2" placeholder="مثال: &lt;@457775919122087936&gt;"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="advisor">مستشار القائد</label>
+          <textarea id="advisor" rows="2" placeholder="منشن المستشار"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="generalSupervisor">المشرف العام</label>
+          <textarea id="generalSupervisor" rows="2" placeholder="منشن المشرف العام"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="fieldSupervisor">المشرف الميداني</label>
+          <textarea id="fieldSupervisor" rows="2" placeholder="منشن المشرف الميداني"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="areaSupervisors">مشرفين المناطق</label>
+          <textarea id="areaSupervisors" rows="2" placeholder="منشن مشرفين المناطق"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="traineeSupervisors">مشرفين متدربين</label>
+          <textarea id="traineeSupervisors" rows="2" placeholder="لا يوجد"></textarea>
+        </div>
+      </div>
+
+      <h2>العمليات والاتصالات</h2>
+      <div class="grid two">
+        <div class="field">
+          <label for="operations">العمليات</label>
+          <textarea id="operations" rows="2" placeholder="منشن العمليات"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="deputyOperations">نائب العمليات</label>
+          <textarea id="deputyOperations" rows="2" placeholder="منشن نائب العمليات"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="callCenter">مركز الاتصالات</label>
+          <textarea id="callCenter" rows="2" placeholder="منشن مركز الاتصالات"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="ladiesCertified">السيدات و المعتمدين</label>
+          <textarea id="ladiesCertified" rows="2" placeholder="اتركها فاضية أو اكتب لا يوجد"></textarea>
+        </div>
+      </div>
+
+      <h2>المناطق</h2>
+      <div class="grid two">
+        <div class="field">
+          <label for="islandPaleto">جزيرة بوليتو</label>
+          <textarea id="islandPaleto" rows="3" placeholder="G-000 أو لايوجد"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="paleto">بوليتو</label>
+          <textarea id="paleto" rows="3" placeholder="G-000 أو لايوجد"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="sandy">ساندي</label>
+          <textarea id="sandy" rows="5" placeholder="G-534&#10;G-507"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="los">لوس</label>
+          <textarea id="los" rows="5" placeholder="G-506"></textarea>
+        </div>
+      </div>
+
+      <h2>خدمات الأسطول</h2>
+      <div class="grid three">
+        <div class="field">
+          <label for="fleetCount">عدد</label>
+          <input id="fleetCount" type="number" min="0" value="0" placeholder="00" />
+        </div>
+
+        <div class="field">
+          <label for="losPort">ميناء لوس</label>
+          <textarea id="losPort" rows="2" placeholder="لا يوجد"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="paletoPort">ميناء بوليتو</label>
+          <textarea id="paletoPort" rows="2" placeholder="لا يوجد"></textarea>
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button id="generateBtn" class="primary" type="button">إنشاء التقرير</button>
+        <button id="copyReportBtn" class="secondary" type="button">نسخ التقرير</button>
+        <button id="exampleBtn" class="ghost" type="button">تعبئة مثال</button>
+        <button id="clearBtn" class="danger" type="button">مسح الخانات</button>
+      </div>
+
+      <div class="field result-wrap">
+        <label for="reportOutput">التقرير النهائي</label>
+        <textarea id="reportOutput" class="report-output" rows="24" readonly>سيظهر التقرير هنا بعد الضغط على إنشاء التقرير.</textarea>
+      </div>
+    </section>
+    </div>
+  </main>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="report.js"></script>
+</body>
+</html>
