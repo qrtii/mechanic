@@ -1,430 +1,444 @@
-const $ = (id) => document.getElementById(id);
+(function () {
+  'use strict';
 
-const typeSelect = $('adminReportType');
-const output = $('adminOutput');
-const DEFAULT_LEAVE_RULES_LINK = 'https://discord.com/channels/1071933157097615480/1071934713524133918/1500101205320536155';
-const DEFAULT_LEAVE_NOTES = 'يلزم الفني اكمال 24 ساعة من اخر اجازة و التأكد من المخالفات و تصفير الاجازات';
-const DEFAULT_ROLE_MENTION = '<@&1149742928953086105>';
-
-const forms = {
-  leave: $('leaveForm'),
-  assignment: $('assignmentForm')
-};
-
-const leaveFields = {
-  personLabel: $('leavePersonLabel'),
-  technician: $('leaveTechnician'),
-  duration: $('leaveDuration'),
-  remaining: $('leaveRemaining'),
-  calculatedRemaining: $('leaveCalculatedRemaining'),
-  fromDate: $('leaveFromDate'),
-  fromTime: $('leaveFromTime'),
-  fromPeriod: $('leaveFromPeriod'),
-  toDate: $('leaveToDate'),
-  toTime: $('leaveToTime'),
-  toPeriod: $('leaveToPeriod'),
-  rulesLink: $('leaveRulesLink'),
-  notes: $('leaveNotes'),
-  roleMention: $('leaveRoleMention'),
-  signature: $('rewardSignature')
-};
-
-const leaveUi = {
-  balanceFields: Array.from(document.querySelectorAll('.leave-balance-field')),
-  notesTitle: document.querySelector('.leave-notes-title'),
-  notesGroup: document.querySelector('.leave-notes-group'),
-  signatureTitle: document.querySelector('.reward-signature-title'),
-  signatureGroup: document.querySelector('.reward-signature-group')
-};
-
-const assignmentFields = {
-  mention: $('assignmentMention'),
-  employee: $('assignmentEmployee'),
-  sector: $('assignmentSector'),
-  duration: $('assignmentDuration')
-};
-
-function value(input, fallback = 'لا يوجد') {
-  const text = String(input?.value || '').trim();
-  return text.length ? text : fallback;
-}
-
-function setValue(input, val) {
-  input.value = val;
-}
-
-function formatDate(input, fallback = '0000/00/00') {
-  const text = String(input.value || '').trim();
-  if (!text.length) return fallback;
-  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text.replaceAll('-', '/');
-  return text;
-}
-
-function formatTime(input, fallback = '00:00') {
-  const text = String(input.value || '').trim();
-  return text.length ? text : fallback;
-}
-
-function normalizeArabicNumbers(text) {
-  return String(text || '')
-    .replace(/[٠-٩]/g, (digit) => '٠١٢٣٤٥٦٧٨٩'.indexOf(digit))
-    .replace(/[۰-۹]/g, (digit) => '۰۱۲۳۴۵۶۷۸۹'.indexOf(digit));
-}
-
-
-function convertDiscordIdsToMentions(text) {
-  const placeholders = [];
-  let working = normalizeArabicNumbers(String(text || ''));
-
-  working = working.replace(/<@&?!?\d{15,25}>|<@!?\d{15,25}>/g, (mention) => {
-    const token = `__MENTION_${placeholders.length}__`;
-    placeholders.push(mention);
-    return token;
-  });
-
-  working = working.replace(/\b\d{15,25}\b/g, (id) => `<@${id}>`);
-
-  placeholders.forEach((mention, index) => {
-    working = working.replace(`__MENTION_${index}__`, mention);
-  });
-
-  return working.trim();
-}
-
-function formatMentionField(input) {
-  if (!input) return;
-  const before = input.value;
-  const after = convertDiscordIdsToMentions(before);
-  if (after !== before) {
-    input.value = after;
-  }
-}
-
-function scheduleMentionFieldFormat(input) {
-  if (!input) return;
-  window.clearTimeout(input.autoMentionTimer);
-  input.autoMentionTimer = window.setTimeout(() => {
-    const text = normalizeArabicNumbers(input.value);
-    // عند لصق أو كتابة Copy ID كامل، يظهر المنشن داخل الخانة نفسها مباشرة.
-    if (/\b\d{17,25}\b/.test(text)) {
-      formatMentionField(input);
-    }
-  }, 120);
-}
-
-const adminAutoMentionFields = [
-  leaveFields.technician,
-  leaveFields.signature,
-  assignmentFields.mention
-];
-
-function formatAdminAutoMentions() {
-  adminAutoMentionFields.forEach(formatMentionField);
-}
-
-function parseHours(text) {
-  const clean = normalizeArabicNumbers(text).trim();
-  if (!clean) return null;
-
-  const timeMatch = clean.match(/(\d+(?:\.\d+)?)\s*[:：]\s*(\d+(?:\.\d+)?)/);
-  if (timeMatch) return Number(timeMatch[1]) + (Number(timeMatch[2]) / 60);
-
-  const numberMatch = clean.match(/-?\d+(?:\.\d+)?/);
-  if (!numberMatch) return null;
-  return Number(numberMatch[0]);
-}
-
-function formatHours(amount) {
-  if (amount === null || Number.isNaN(amount)) return '';
-  const rounded = Math.round(amount * 100) / 100;
-  const text = Number.isInteger(rounded) ? String(rounded) : String(rounded).replace(/\.?0+$/, '');
-  return `${text} ساعة`;
-}
-
-function calculateRemainingBalance() {
-  const balance = parseHours(leaveFields.remaining.value);
-  const duration = parseHours(leaveFields.duration.value);
-  if (balance === null || duration === null) {
-    leaveFields.calculatedRemaining.value = '';
-    return '';
+  function $(id) {
+    return document.getElementById(id);
   }
 
-  const remaining = balance - duration;
-  const formatted = formatHours(remaining);
-  leaveFields.calculatedRemaining.value = formatted;
-  return formatted;
-}
+  var typeSelect = $('adminReportType');
+  var output = $('adminOutput');
+  var DEFAULT_LEAVE_RULES_LINK = 'https://discord.com/channels/1071933157097615480/1071934713524133918/1500101205320536155';
+  var DEFAULT_LEAVE_NOTES = 'يلزم الفني اكمال 24 ساعة من اخر اجازة و التأكد من المخالفات و تصفير الاجازات';
+  var DEFAULT_ROLE_MENTION = '<@&1149742928953086105>';
+  var DEFAULT_OUTPUT_TEXT = 'سيظهر التقرير الإداري هنا بعد الضغط على إنشاء التقرير.';
 
-function toast(message) {
-  const box = $('toast');
-  box.textContent = message;
-  box.classList.add('show');
-  clearTimeout(toast.timer);
-  toast.timer = setTimeout(() => box.classList.remove('show'), 1800);
-}
-
-function isMerchantLeave() {
-  return typeSelect.value === 'merchantLeave';
-}
-
-function isLeadershipReward() {
-  return typeSelect.value === 'leadershipReward';
-}
-
-function currentSection() {
-  return typeSelect.value === 'externalAssignment' ? 'assignment' : 'leave';
-}
-
-function ensureLeaveRulesLink() {
-  if (!String(leaveFields.rulesLink.value || '').trim()) {
-    leaveFields.rulesLink.value = DEFAULT_LEAVE_RULES_LINK;
-  }
-}
-
-function ensureLeaveNotes() {
-  if (!String(leaveFields.notes.value || '').trim()) {
-    leaveFields.notes.value = DEFAULT_LEAVE_NOTES;
-  }
-}
-
-function ensureRoleMention() {
-  if (!String(leaveFields.roleMention.value || '').trim()) {
-    leaveFields.roleMention.value = DEFAULT_ROLE_MENTION;
-  }
-}
-
-function toggleLeaveUi() {
-  const merchant = isMerchantLeave();
-  const reward = isLeadershipReward();
-  leaveFields.personLabel.textContent = merchant ? 'التاجر المحترم' : 'الفني المحترم';
-  leaveFields.technician.placeholder = 'ضع Copy ID هنا وسيظهر كمنشن تلقائياً';
-  leaveUi.balanceFields.forEach((el) => el.classList.toggle('hidden', merchant || reward));
-  leaveUi.notesTitle?.classList.toggle('hidden', merchant || reward);
-  leaveUi.notesGroup?.classList.toggle('hidden', merchant || reward);
-  leaveUi.signatureTitle?.classList.toggle('hidden', !reward);
-  leaveUi.signatureGroup?.classList.toggle('hidden', !reward);
-}
-
-function updateVisibleForm() {
-  const section = currentSection();
-  Object.entries(forms).forEach(([key, form]) => {
-    form.classList.toggle('hidden', key !== section);
-  });
-  toggleLeaveUi();
-  output.value = 'سيظهر التقرير الإداري هنا بعد الضغط على إنشاء التقرير.';
-}
-
-function getLeaveCommonData() {
-  ensureLeaveRulesLink();
-  ensureRoleMention();
-  return {
-    person: String(leaveFields.technician.value || '').trim(),
-    duration: value(leaveFields.duration, '00 ساعة'),
-    fromDate: formatDate(leaveFields.fromDate),
-    fromTime: formatTime(leaveFields.fromTime),
-    fromPeriod: value(leaveFields.fromPeriod, 'ص'),
-    toDate: formatDate(leaveFields.toDate),
-    toTime: formatTime(leaveFields.toTime),
-    toPeriod: value(leaveFields.toPeriod, 'ص'),
-    rulesLink: value(leaveFields.rulesLink, DEFAULT_LEAVE_RULES_LINK),
-    roleMention: value(leaveFields.roleMention, DEFAULT_ROLE_MENTION)
+  var forms = {
+    leave: $('leaveForm'),
+    assignment: $('assignmentForm')
   };
-}
 
-function buildMerchantLeaveReport() {
-  const data = getLeaveCommonData();
-  return `***\` إجازة تاجر \`*** 
+  var leaveFields = {
+    personLabel: $('leavePersonLabel'),
+    technician: $('leaveTechnician'),
+    duration: $('leaveDuration'),
+    remaining: $('leaveRemaining'),
+    calculatedRemaining: $('leaveCalculatedRemaining'),
+    fromDate: $('leaveFromDate'),
+    fromTime: $('leaveFromTime'),
+    fromPeriod: $('leaveFromPeriod'),
+    toDate: $('leaveToDate'),
+    toTime: $('leaveToTime'),
+    toPeriod: $('leaveToPeriod'),
+    rulesLink: $('leaveRulesLink'),
+    notes: $('leaveNotes'),
+    roleMention: $('leaveRoleMention'),
+    signature: $('rewardSignature')
+  };
 
-***\`التاجر المحترم :\` ${data.person}     ***            
+  var assignmentFields = {
+    mention: $('assignmentMention'),
+    employee: $('assignmentEmployee'),
+    sector: $('assignmentSector'),
+    duration: $('assignmentDuration')
+  };
 
-***\`المــــدة :\` ${data.duration}*** 
-
-***من تاريخ ${data.fromDate} ${data.fromTime} ${data.fromPeriod}*** 
-***الى تاريخ ${data.toDate} ${data.toTime} ${data.toPeriod} *** 
-
-
-***يجب قراءة كامل [قوانين الإجازات](${data.rulesLink}) والافادة بالاستلام بوضع رياكشن ***
-
-\`جهلك بالقوانين لا يعفيك من العقوبة
-\`*** 
-${data.roleMention}  ***`;
-}
-
-function buildLeadershipRewardReport() {
-  const data = getLeaveCommonData();
-  const signature = String(leaveFields.signature.value || '').trim();
-
-  return `***\` مكافأة قيادية  \`*** 
-
-***\`الفني المحترم :\` ${data.person}     ***            
-
-***\`المــــدة :\` ${data.duration}***  
-
-***من تاريخ ${data.fromDate} ${data.fromTime} ${data.fromPeriod}*** 
-***الى تاريخ ${data.toDate} ${data.toTime} ${data.toPeriod} *** 
-
-
-***يجب قراءة كامل [قوانين الإجازات](${data.rulesLink}) والافادة بالاستلام بوضع رياكشن ***
-
-\`جهلك بالقوانين لا يعفيك من العقوبة
-\`*** 
-***\`توقيع و اعتماد :\` ${signature}***  
-
-${data.roleMention}  ***`;
-}
-
-function buildLeaveReport() {
-  if (isMerchantLeave()) return buildMerchantLeaveReport();
-  if (isLeadershipReward()) return buildLeadershipRewardReport();
-
-  const title = typeSelect.value === 'externalLeave' ? 'إجازة خارجية' : 'إجازة داخلية';
-  const data = getLeaveCommonData();
-  const remaining = calculateRemainingBalance() || value(leaveFields.calculatedRemaining, '00 ساعة');
-  const notes = value(leaveFields.notes, DEFAULT_LEAVE_NOTES);
-
-  return `***\` ${title} \`*** 
-
-***\`الفني المحترم : \` ${value(leaveFields.technician)}     ***            
-
-***\`المــــدة :\` ${data.duration}*** 
-***\`الرصيد المتبقي :\` ${remaining}*** 
-
-***من تاريخ ${data.fromDate} ${data.fromTime} ${data.fromPeriod}*** 
-***الى تاريخ ${data.toDate} ${data.toTime} ${data.toPeriod} *** 
-
-***\`الملاحظات :\` ${notes}***
-
-***يجب قراءة كامل [قوانين الإجازات](${data.rulesLink}) والافادة بالاستلام بوضع رياكشن ***
-
-\`جهلك بالقوانين لا يعفيك من العقوبة
-\`*** 
-${data.roleMention}  ***`;
-}
-
-function buildAssignmentReport() {
-  return `*** ▬▬▬ ﷽ ▬▬
-\`\`\`الموضوع : انتداب خارجي \`\`\`
-السلام عليكم ورحمة الله وبركاته، وبعد:
- \`\`\`cs
-# إشارة إلى طلب الموظف الموضحة بياناته أدناه بشأن الانتداب خارج الكراج، نفيدكم بأنه تمت الموافقة على طلبه وفق التفاصيل التالية:
-\`\`\`
-
- الاسم:  ${value(assignmentFields.mention)} 
- اسم وكود الموظف :  ${value(assignmentFields.employee, '[CD| G-163] سعيد البدواوي')}
- القطاع المنتدب له: ${value(assignmentFields.sector, 'لا يوجد')}
- المدة : ${value(assignmentFields.duration, 'لا يوجد')}
-نرجوا من الموظف التقيد بالأنظمة والتعليمات الخاصة بالانتدابات، والتنسيق مع الجهة المعنية قبل المباشرة. ***`;
-}
-
-function buildReport() {
-  formatAdminAutoMentions();
-  return currentSection() === 'assignment' ? buildAssignmentReport() : buildLeaveReport();
-}
-
-function fillExample() {
-  const type = typeSelect.value;
-
-  if (type === 'internalLeave' || type === 'externalLeave') {
-    setValue(leaveFields.technician, '<@943708520648433674>');
-    setValue(leaveFields.duration, '3 ساعة');
-    setValue(leaveFields.remaining, '19 ساعة');
-    calculateRemainingBalance();
-    setValue(leaveFields.fromDate, '2026-06-29');
-    setValue(leaveFields.fromTime, '04:10');
-    setValue(leaveFields.fromPeriod, 'ص');
-    setValue(leaveFields.toDate, '2026-06-29');
-    setValue(leaveFields.toTime, '07:10');
-    setValue(leaveFields.toPeriod, 'ص');
-    setValue(leaveFields.rulesLink, DEFAULT_LEAVE_RULES_LINK);
-    setValue(leaveFields.notes, DEFAULT_LEAVE_NOTES);
-    setValue(leaveFields.roleMention, DEFAULT_ROLE_MENTION);
+  function safeText(input, fallback) {
+    if (fallback === undefined) fallback = 'لا يوجد';
+    var text = input && input.value !== undefined ? String(input.value).trim() : '';
+    return text.length ? text : fallback;
   }
 
-  if (type === 'merchantLeave' || type === 'leadershipReward') {
-    setValue(leaveFields.technician, '');
-    setValue(leaveFields.duration, '00 ساعة');
-    setValue(leaveFields.remaining, '');
-    setValue(leaveFields.calculatedRemaining, '');
-    setValue(leaveFields.fromDate, '2026-06-29');
-    setValue(leaveFields.fromTime, '00:00');
-    setValue(leaveFields.fromPeriod, 'ص');
-    setValue(leaveFields.toDate, '2026-06-29');
-    setValue(leaveFields.toTime, '00:00');
-    setValue(leaveFields.toPeriod, 'م');
-    setValue(leaveFields.rulesLink, DEFAULT_LEAVE_RULES_LINK);
-    setValue(leaveFields.roleMention, DEFAULT_ROLE_MENTION);
-    if (type === 'leadershipReward') {
-      setValue(leaveFields.technician, '<@943708520648433674>');
-      setValue(leaveFields.signature, '');
+  function setValue(input, val) {
+    if (input) input.value = val;
+  }
+
+  function normalizeArabicNumbers(text) {
+    return String(text || '')
+      .replace(/[٠-٩]/g, function (digit) { return '٠١٢٣٤٥٦٧٨٩'.indexOf(digit); })
+      .replace(/[۰-۹]/g, function (digit) { return '۰۱۲۳۴۵۶۷۸۹'.indexOf(digit); });
+  }
+
+  function convertDiscordIdsToMentions(text) {
+    var placeholders = [];
+    var working = normalizeArabicNumbers(text);
+
+    // احفظ المنشنات الموجودة حتى لا تتحول مرتين.
+    working = working.replace(/<@&?\d{15,25}>|<@!?\d{15,25}>/g, function (mention) {
+      var token = '__MENTION_' + placeholders.length + '__';
+      placeholders.push(mention);
+      return token;
+    });
+
+    working = working.replace(/\b\d{15,25}\b/g, function (id) {
+      return '<@' + id + '>';
+    });
+
+    placeholders.forEach(function (mention, index) {
+      working = working.replace('__MENTION_' + index + '__', mention);
+    });
+
+    return working.trim();
+  }
+
+  function formatMentionField(input) {
+    if (!input) return;
+    var before = input.value || '';
+    var after = convertDiscordIdsToMentions(before);
+    if (after !== before) input.value = after;
+  }
+
+  function scheduleMentionFieldFormat(input) {
+    if (!input) return;
+    clearTimeout(input.autoMentionTimer);
+    input.autoMentionTimer = setTimeout(function () {
+      var text = normalizeArabicNumbers(input.value || '');
+      if (/\b\d{17,25}\b/.test(text)) formatMentionField(input);
+    }, 120);
+  }
+
+  var adminAutoMentionFields = [
+    leaveFields.technician,
+    leaveFields.signature,
+    assignmentFields.mention
+  ].filter(Boolean);
+
+  function formatAdminAutoMentions() {
+    adminAutoMentionFields.forEach(formatMentionField);
+  }
+
+  function formatDate(input, fallback) {
+    if (fallback === undefined) fallback = '0000/00/00';
+    var text = input && input.value !== undefined ? String(input.value).trim() : '';
+    if (!text) return fallback;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text.replace(/-/g, '/');
+    return text;
+  }
+
+  function formatTime(input, fallback) {
+    if (fallback === undefined) fallback = '00:00';
+    var text = input && input.value !== undefined ? String(input.value).trim() : '';
+    return text.length ? text : fallback;
+  }
+
+  function parseHours(text) {
+    var clean = normalizeArabicNumbers(text).trim();
+    if (!clean) return null;
+
+    var timeMatch = clean.match(/(\d+(?:\.\d+)?)\s*[:：]\s*(\d+(?:\.\d+)?)/);
+    if (timeMatch) return Number(timeMatch[1]) + (Number(timeMatch[2]) / 60);
+
+    var numberMatch = clean.match(/-?\d+(?:\.\d+)?/);
+    if (!numberMatch) return null;
+    return Number(numberMatch[0]);
+  }
+
+  function formatHours(amount) {
+    if (amount === null || Number.isNaN(amount)) return '';
+    var rounded = Math.round(amount * 100) / 100;
+    var text = Number.isInteger(rounded) ? String(rounded) : String(rounded).replace(/\.?0+$/, '');
+    return text + ' ساعة';
+  }
+
+  function calculateRemainingBalance() {
+    if (!leaveFields.remaining || !leaveFields.duration || !leaveFields.calculatedRemaining) return '';
+    var balance = parseHours(leaveFields.remaining.value);
+    var duration = parseHours(leaveFields.duration.value);
+    if (balance === null || duration === null) {
+      leaveFields.calculatedRemaining.value = '';
+      return '';
+    }
+
+    var remaining = balance - duration;
+    var formatted = formatHours(remaining);
+    leaveFields.calculatedRemaining.value = formatted;
+    return formatted;
+  }
+
+  function toast(message) {
+    var box = $('toast');
+    if (!box) return;
+    box.textContent = message;
+    box.classList.add('show');
+    clearTimeout(toast.timer);
+    toast.timer = setTimeout(function () { box.classList.remove('show'); }, 1800);
+  }
+
+  function currentType() {
+    return typeSelect ? typeSelect.value : 'internalLeave';
+  }
+
+  function isMerchantLeave() {
+    return currentType() === 'merchantLeave';
+  }
+
+  function isLeadershipReward() {
+    return currentType() === 'leadershipReward';
+  }
+
+  function currentSection() {
+    return currentType() === 'externalAssignment' ? 'assignment' : 'leave';
+  }
+
+  function ensureLeaveRulesLink() {
+    if (leaveFields.rulesLink && !String(leaveFields.rulesLink.value || '').trim()) {
+      leaveFields.rulesLink.value = DEFAULT_LEAVE_RULES_LINK;
     }
   }
 
-  if (type === 'externalAssignment') {
-    setValue(assignmentFields.mention, '<@481603641158139924>');
-    setValue(assignmentFields.employee, '[CD| G-163] سعيد البدواوي');
-    setValue(assignmentFields.sector, 'شرطة لوس');
-    setValue(assignmentFields.duration, 'يومين');
+  function ensureLeaveNotes() {
+    if (leaveFields.notes && !String(leaveFields.notes.value || '').trim()) {
+      leaveFields.notes.value = DEFAULT_LEAVE_NOTES;
+    }
   }
 
-  output.value = buildReport();
-  toast('تمت تعبئة المثال');
-}
+  function ensureRoleMention() {
+    if (leaveFields.roleMention && !String(leaveFields.roleMention.value || '').trim()) {
+      leaveFields.roleMention.value = DEFAULT_ROLE_MENTION;
+    }
+  }
 
-function clearVisibleFields() {
-  const section = currentSection();
-  const fieldGroups = { leave: leaveFields, assignment: assignmentFields };
-  Object.entries(fieldGroups[section]).forEach(([key, input]) => {
-    if (key === 'personLabel') return;
-    input.value = '';
-  });
-  if (section === 'leave') {
+  function toggleElements(selector, hidden) {
+    Array.prototype.forEach.call(document.querySelectorAll(selector), function (el) {
+      el.classList.toggle('hidden', hidden);
+    });
+  }
+
+  function toggleLeaveUi() {
+    var merchant = isMerchantLeave();
+    var reward = isLeadershipReward();
+
+    if (leaveFields.personLabel) {
+      leaveFields.personLabel.textContent = merchant ? 'التاجر المحترم' : 'الفني المحترم';
+    }
+    if (leaveFields.technician) {
+      leaveFields.technician.placeholder = 'ضع Copy ID هنا وسيظهر كمنشن تلقائياً';
+    }
+
+    toggleElements('.leave-balance-field', merchant || reward);
+    toggleElements('.leave-notes-title', merchant || reward);
+    toggleElements('.leave-notes-group', merchant || reward);
+    toggleElements('.reward-signature-title', !reward);
+    toggleElements('.reward-signature-group', !reward);
+  }
+
+  function updateVisibleForm() {
+    var section = currentSection();
+    Object.keys(forms).forEach(function (key) {
+      if (forms[key]) forms[key].classList.toggle('hidden', key !== section);
+    });
+    toggleLeaveUi();
+    if (output) output.value = DEFAULT_OUTPUT_TEXT;
+  }
+
+  function getLeaveCommonData() {
     ensureLeaveRulesLink();
-    ensureLeaveNotes();
     ensureRoleMention();
+    formatMentionField(leaveFields.technician);
+    formatMentionField(leaveFields.signature);
+
+    return {
+      person: safeText(leaveFields.technician, ''),
+      duration: safeText(leaveFields.duration, '00 ساعة'),
+      fromDate: formatDate(leaveFields.fromDate),
+      fromTime: formatTime(leaveFields.fromTime),
+      fromPeriod: safeText(leaveFields.fromPeriod, 'ص'),
+      toDate: formatDate(leaveFields.toDate),
+      toTime: formatTime(leaveFields.toTime),
+      toPeriod: safeText(leaveFields.toPeriod, 'ص'),
+      rulesLink: safeText(leaveFields.rulesLink, DEFAULT_LEAVE_RULES_LINK),
+      roleMention: safeText(leaveFields.roleMention, DEFAULT_ROLE_MENTION)
+    };
   }
-  output.value = 'سيظهر التقرير الإداري هنا بعد الضغط على إنشاء التقرير.';
-  toast('تم مسح الخانات');
-}
 
-$('generateAdminBtn').addEventListener('click', () => {
-  output.value = buildReport();
-  toast('تم إنشاء التقرير');
-});
-
-$('copyAdminBtn').addEventListener('click', async () => {
-  const text = output.value.trim();
-  if (!text || text.startsWith('سيظهر')) {
-    toast('أنشئ التقرير أولاً');
-    return;
+  function buildMerchantLeaveReport() {
+    var data = getLeaveCommonData();
+    return '***` إجازة تاجر `*** \n\n' +
+      '***`التاجر المحترم :` ' + data.person + '     ***            \n\n' +
+      '***`المــــدة :` ' + data.duration + '*** \n\n' +
+      '***من تاريخ ' + data.fromDate + ' ' + data.fromTime + ' ' + data.fromPeriod + '*** \n' +
+      '***الى تاريخ ' + data.toDate + ' ' + data.toTime + ' ' + data.toPeriod + ' *** \n\n\n' +
+      '***يجب قراءة كامل [قوانين الإجازات](' + data.rulesLink + ') والافادة بالاستلام بوضع رياكشن ***\n\n' +
+      '`جهلك بالقوانين لا يعفيك من العقوبة\n`*** \n' +
+      data.roleMention + '  ***';
   }
 
-  try {
-    await navigator.clipboard.writeText(text);
-    toast('تم نسخ التقرير');
-  } catch (error) {
-    output.select();
-    document.execCommand('copy');
-    toast('تم النسخ');
+  function buildLeadershipRewardReport() {
+    var data = getLeaveCommonData();
+    var signature = safeText(leaveFields.signature, '');
+
+    return '***` مكافأة قيادية  `*** \n\n' +
+      '***`الفني المحترم :` ' + data.person + '     ***            \n\n' +
+      '***`المــــدة :` ' + data.duration + '***  \n\n' +
+      '***من تاريخ ' + data.fromDate + ' ' + data.fromTime + ' ' + data.fromPeriod + '*** \n' +
+      '***الى تاريخ ' + data.toDate + ' ' + data.toTime + ' ' + data.toPeriod + ' *** \n\n\n' +
+      '***يجب قراءة كامل [قوانين الإجازات](' + data.rulesLink + ') والافادة بالاستلام بوضع رياكشن ***\n\n' +
+      '`جهلك بالقوانين لا يعفيك من العقوبة\n`*** \n' +
+      '***`توقيع و اعتماد :` ' + signature + '***  \n\n' +
+      data.roleMention + '  ***';
   }
-});
 
-$('exampleAdminBtn').addEventListener('click', fillExample);
-$('clearAdminBtn').addEventListener('click', clearVisibleFields);
-typeSelect.addEventListener('change', updateVisibleForm);
+  function buildLeaveReport() {
+    if (isMerchantLeave()) return buildMerchantLeaveReport();
+    if (isLeadershipReward()) return buildLeadershipRewardReport();
 
-leaveFields.duration.addEventListener('input', calculateRemainingBalance);
-leaveFields.remaining.addEventListener('input', calculateRemainingBalance);
+    ensureLeaveNotes();
+    var title = currentType() === 'externalLeave' ? 'إجازة خارجية' : 'إجازة داخلية';
+    var data = getLeaveCommonData();
+    var remaining = calculateRemainingBalance() || safeText(leaveFields.calculatedRemaining, '00 ساعة');
+    var notes = safeText(leaveFields.notes, DEFAULT_LEAVE_NOTES);
 
-adminAutoMentionFields.forEach((input) => {
-  input.addEventListener('input', () => scheduleMentionFieldFormat(input));
-  input.addEventListener('change', () => formatMentionField(input));
-  input.addEventListener('blur', () => formatMentionField(input));
-  input.addEventListener('paste', () => {
-    window.setTimeout(() => formatMentionField(input), 0);
-  });
-});
+    return '***` ' + title + ' `*** \n\n' +
+      '***`الفني المحترم : ` ' + safeText(leaveFields.technician, '') + '     ***            \n\n' +
+      '***`المــــدة :` ' + data.duration + '*** \n' +
+      '***`الرصيد المتبقي :` ' + remaining + '*** \n\n' +
+      '***من تاريخ ' + data.fromDate + ' ' + data.fromTime + ' ' + data.fromPeriod + '*** \n' +
+      '***الى تاريخ ' + data.toDate + ' ' + data.toTime + ' ' + data.toPeriod + ' *** \n\n' +
+      '***`الملاحظات :` ' + notes + '***\n\n' +
+      '***يجب قراءة كامل [قوانين الإجازات](' + data.rulesLink + ') والافادة بالاستلام بوضع رياكشن ***\n\n' +
+      '`جهلك بالقوانين لا يعفيك من العقوبة\n`*** \n' +
+      data.roleMention + '  ***';
+  }
 
-ensureLeaveRulesLink();
-ensureLeaveNotes();
-ensureRoleMention();
-updateVisibleForm();
+  function buildAssignmentReport() {
+    formatMentionField(assignmentFields.mention);
+    return '*** ▬▬▬ ﷽ ▬▬\n' +
+      '```الموضوع : انتداب خارجي ```\n' +
+      'السلام عليكم ورحمة الله وبركاته، وبعد:\n' +
+      ' ```cs\n' +
+      '# إشارة إلى طلب الموظف الموضحة بياناته أدناه بشأن الانتداب خارج الكراج، نفيدكم بأنه تمت الموافقة على طلبه وفق التفاصيل التالية:\n' +
+      '```\n\n' +
+      ' الاسم:  ' + safeText(assignmentFields.mention, 'لا يوجد') + ' \n' +
+      ' اسم وكود الموظف :  ' + safeText(assignmentFields.employee, '[CD| G-163] سعيد البدواوي') + '\n' +
+      ' القطاع المنتدب له: ' + safeText(assignmentFields.sector, 'لا يوجد') + '\n' +
+      ' المدة : ' + safeText(assignmentFields.duration, 'لا يوجد') + '\n' +
+      'نرجوا من الموظف التقيد بالأنظمة والتعليمات الخاصة بالانتدابات، والتنسيق مع الجهة المعنية قبل المباشرة. ***';
+  }
+
+  function buildReport() {
+    formatAdminAutoMentions();
+    return currentSection() === 'assignment' ? buildAssignmentReport() : buildLeaveReport();
+  }
+
+  function generateReport() {
+    try {
+      if (output) output.value = buildReport();
+      toast('تم إنشاء التقرير');
+    } catch (error) {
+      console.error(error);
+      toast('حدث خطأ، تم إصلاح الكود في هذه النسخة');
+    }
+  }
+
+  function fillExample() {
+    var type = currentType();
+
+    if (type === 'internalLeave' || type === 'externalLeave') {
+      setValue(leaveFields.technician, '<@943708520648433674>');
+      setValue(leaveFields.duration, '3 ساعة');
+      setValue(leaveFields.remaining, '19 ساعة');
+      calculateRemainingBalance();
+      setValue(leaveFields.fromDate, '2026-06-29');
+      setValue(leaveFields.fromTime, '04:10');
+      setValue(leaveFields.fromPeriod, 'ص');
+      setValue(leaveFields.toDate, '2026-06-29');
+      setValue(leaveFields.toTime, '07:10');
+      setValue(leaveFields.toPeriod, 'ص');
+      setValue(leaveFields.rulesLink, DEFAULT_LEAVE_RULES_LINK);
+      setValue(leaveFields.notes, DEFAULT_LEAVE_NOTES);
+      setValue(leaveFields.roleMention, DEFAULT_ROLE_MENTION);
+    }
+
+    if (type === 'merchantLeave' || type === 'leadershipReward') {
+      setValue(leaveFields.technician, type === 'leadershipReward' ? '<@943708520648433674>' : '<@943708520648433674>');
+      setValue(leaveFields.duration, '00 ساعة');
+      setValue(leaveFields.remaining, '');
+      setValue(leaveFields.calculatedRemaining, '');
+      setValue(leaveFields.fromDate, '2026-06-29');
+      setValue(leaveFields.fromTime, '00:00');
+      setValue(leaveFields.fromPeriod, 'ص');
+      setValue(leaveFields.toDate, '2026-06-29');
+      setValue(leaveFields.toTime, '00:00');
+      setValue(leaveFields.toPeriod, 'م');
+      setValue(leaveFields.rulesLink, DEFAULT_LEAVE_RULES_LINK);
+      setValue(leaveFields.roleMention, DEFAULT_ROLE_MENTION);
+      if (type === 'leadershipReward') setValue(leaveFields.signature, '<@943708520648433674>');
+    }
+
+    if (type === 'externalAssignment') {
+      setValue(assignmentFields.mention, '<@481603641158139924>');
+      setValue(assignmentFields.employee, '[CD| G-163] سعيد البدواوي');
+      setValue(assignmentFields.sector, 'شرطة لوس');
+      setValue(assignmentFields.duration, 'يومين');
+    }
+
+    if (output) output.value = buildReport();
+    toast('تمت تعبئة المثال');
+  }
+
+  function clearVisibleFields() {
+    var section = currentSection();
+    var group = section === 'assignment' ? assignmentFields : leaveFields;
+    Object.keys(group).forEach(function (key) {
+      if (key === 'personLabel') return;
+      if (group[key] && group[key].value !== undefined) group[key].value = '';
+    });
+    if (section === 'leave') {
+      ensureLeaveRulesLink();
+      ensureLeaveNotes();
+      ensureRoleMention();
+    }
+    if (output) output.value = DEFAULT_OUTPUT_TEXT;
+    toast('تم مسح الخانات');
+  }
+
+  function copyReport() {
+    var text = output ? output.value.trim() : '';
+    if (!text || text.indexOf('سيظهر') === 0) {
+      toast('أنشئ التقرير أولاً');
+      return;
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        toast('تم نسخ التقرير');
+      }).catch(function () {
+        output.select();
+        document.execCommand('copy');
+        toast('تم النسخ');
+      });
+    } else {
+      output.select();
+      document.execCommand('copy');
+      toast('تم النسخ');
+    }
+  }
+
+  function bindEvents() {
+    var generateBtn = $('generateAdminBtn');
+    var copyBtn = $('copyAdminBtn');
+    var exampleBtn = $('exampleAdminBtn');
+    var clearBtn = $('clearAdminBtn');
+
+    if (generateBtn) generateBtn.addEventListener('click', generateReport);
+    if (copyBtn) copyBtn.addEventListener('click', copyReport);
+    if (exampleBtn) exampleBtn.addEventListener('click', fillExample);
+    if (clearBtn) clearBtn.addEventListener('click', clearVisibleFields);
+    if (typeSelect) typeSelect.addEventListener('change', updateVisibleForm);
+
+    if (leaveFields.duration) leaveFields.duration.addEventListener('input', calculateRemainingBalance);
+    if (leaveFields.remaining) leaveFields.remaining.addEventListener('input', calculateRemainingBalance);
+
+    adminAutoMentionFields.forEach(function (input) {
+      input.addEventListener('input', function () { scheduleMentionFieldFormat(input); });
+      input.addEventListener('change', function () { formatMentionField(input); });
+      input.addEventListener('blur', function () { formatMentionField(input); });
+      input.addEventListener('paste', function () { setTimeout(function () { formatMentionField(input); }, 0); });
+    });
+  }
+
+  ensureLeaveRulesLink();
+  ensureLeaveNotes();
+  ensureRoleMention();
+  bindEvents();
+  updateVisibleForm();
+}());
