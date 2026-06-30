@@ -117,7 +117,7 @@ function buildReport() {
 
   return `**تم استلام التقرير الميداني لـكراج الميكانيكي 
 
-تقرير رقم ${reportNumber}
+تقرير رقم (${reportNumber || "0"})
 من الساعة ${fromTime} ( ${fromPeriod} )
 حتى الساعة ${toTime} ( ${toPeriod} )
 
