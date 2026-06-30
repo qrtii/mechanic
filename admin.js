@@ -115,7 +115,27 @@
   function formatTime(input, fallback) {
     if (fallback === undefined) fallback = '00:00';
     var text = input && input.value !== undefined ? String(input.value).trim() : '';
-    return text.length ? text : fallback;
+    text = text.length ? text : fallback;
+    return toTwelveHourTime(text);
+  }
+
+  function toTwelveHourTime(text) {
+    var clean = normalizeArabicNumbers(String(text || '')).trim();
+    var match = clean.match(/^(\d{1,2})\s*[:：]\s*(\d{1,2})/);
+    if (!match) return clean || '12:00';
+
+    var hour = Number(match[1]);
+    var minute = Number(match[2]);
+    if (Number.isNaN(hour)) hour = 0;
+    if (Number.isNaN(minute)) minute = 0;
+
+    hour = ((hour % 24) + 24) % 24;
+    minute = Math.max(0, Math.min(59, minute));
+
+    var hour12 = hour % 12;
+    if (hour12 === 0) hour12 = 12;
+
+    return String(hour12).padStart(2, '0') + ':' + String(minute).padStart(2, '0');
   }
 
   function parseHours(text) {

@@ -55,6 +55,25 @@ function value(input, fallback = 'لا يوجد') {
   return text.length ? text : fallback;
 }
 
+function toTwelveHourTime(rawTime, fallback = '00:00') {
+  const text = normalizeDigits(String(rawTime || '').trim() || fallback);
+  const match = text.match(/^(\d{1,2})\s*[:：]\s*(\d{1,2})/);
+  if (!match) return text || '12:00';
+
+  let hour = Number(match[1]);
+  let minute = Number(match[2]);
+  if (Number.isNaN(hour)) hour = 0;
+  if (Number.isNaN(minute)) minute = 0;
+
+  hour = ((hour % 24) + 24) % 24;
+  minute = Math.max(0, Math.min(59, minute));
+
+  let hour12 = hour % 12;
+  if (hour12 === 0) hour12 = 12;
+
+  return String(hour12).padStart(2, '0') + ':' + String(minute).padStart(2, '0');
+}
+
 
 function normalizeDigits(text) {
   const map = {
@@ -137,9 +156,9 @@ function toast(message) {
 function buildSupervisionReport() {
   formatSupervisionMentions();
   const reportNumber = value(fields.reportNumber, '00');
-  const fromTime = value(fields.fromTime, '00:00');
+  const fromTime = toTwelveHourTime(value(fields.fromTime, '00:00'));
   const fromPeriod = value(fields.fromPeriod, 'ص');
-  const toTime = value(fields.toTime, '00:00');
+  const toTime = toTwelveHourTime(value(fields.toTime, '00:00'));
   const toPeriod = value(fields.toPeriod, 'ص');
   const supervisionLink = value(fields.supervisionSubmitLink, '');
   const operationsLink = value(fields.operationsReportLink, '');
@@ -245,8 +264,8 @@ function clearFields() {
     if (key !== 'output') input.value = '';
   });
   fields.reportNumber.value = '00';
-  fields.fromTime.value = '00:00';
-  fields.toTime.value = '00:00';
+  fields.fromTime.value = '12:00';
+  fields.toTime.value = '12:00';
   fields.fromPeriod.value = 'ص';
   fields.toPeriod.value = 'ص';
   fields.supervisionSubmitLink.value = '';

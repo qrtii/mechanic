@@ -37,6 +37,26 @@ function numberValue(input, fallback = '00') {
   return text.padStart(2, '0');
 }
 
+function toTwelveHourTime(rawTime, fallback = '00:00') {
+  const text = normalizeDigits(String(rawTime || '').trim() || fallback);
+  const match = text.match(/^(\d{1,2})\s*[:：]\s*(\d{1,2})/);
+  if (!match) return text || '12:00';
+
+  let hour = Number(match[1]);
+  let minute = Number(match[2]);
+  if (Number.isNaN(hour)) hour = 0;
+  if (Number.isNaN(minute)) minute = 0;
+
+  hour = ((hour % 24) + 24) % 24;
+  minute = Math.max(0, Math.min(59, minute));
+
+  let hour12 = hour % 12;
+  if (hour12 === 0) hour12 = 12;
+
+  return String(hour12).padStart(2, '0') + ':' + String(minute).padStart(2, '0');
+}
+
+
 function convertDiscordIdsToMentions(text) {
   const placeholders = [];
   let working = normalizeDigits(String(text || ''));
@@ -90,8 +110,8 @@ function toast(message) {
 
 function buildReport() {
   const reportNumber = value(fields.reportNumber, '');
-  const fromTime = value(fields.fromTime, '00:00');
-  const toTime = value(fields.toTime, '00:00');
+  const fromTime = toTwelveHourTime(value(fields.fromTime, '00:00'));
+  const toTime = toTwelveHourTime(value(fields.toTime, '00:00'));
   const fromPeriod = value(fields.fromPeriod, 'ص');
   const toPeriod = value(fields.toPeriod, 'ص');
 
@@ -173,9 +193,9 @@ async function copyReport() {
 
 function fillExample() {
   fields.reportNumber.value = '';
-  fields.fromTime.value = '7:00';
+  fields.fromTime.value = '07:00';
   fields.fromPeriod.value = 'ص';
-  fields.toTime.value = '8:00';
+  fields.toTime.value = '08:00';
   fields.toPeriod.value = 'ص';
   fields.garageLeader.value = '<@457775919122087936>';
   fields.advisor.value = '<@1139633117875933325>';
@@ -201,8 +221,8 @@ function clearFields() {
   Object.entries(fields).forEach(([key, input]) => {
     if (key !== 'reportOutput') input.value = '';
   });
-  fields.fromTime.value = '7:00';
-  fields.toTime.value = '8:00';
+  fields.fromTime.value = '07:00';
+  fields.toTime.value = '08:00';
   fields.fromPeriod.value = 'ص';
   fields.toPeriod.value = 'ص';
   fields.fleetCount.value = '0';
