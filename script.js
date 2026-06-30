@@ -1,7 +1,5 @@
-// غيّر هذا النص إذا كنت تريد صيغة مختلفة للناتج النهائي.
-// المتغيرات المتاحة: {rank} {company} {certified} {playerName}
-const OUTPUT_FORMAT = "{company}{certified}{playerName}{rank} ";
-
+// صيغة الناتج في التوجيه الميداني:
+// الاسم | لاعب معتمد | الكود | الموقع / المسمى الميداني
 const rankInput = document.getElementById("rank");
 const companyInput = document.getElementById("company");
 const certifiedInput = document.getElementById("certified");
@@ -25,19 +23,8 @@ function makeText() {
     return "";
   }
 
-const parts = {
-  playerName: playerName ? ` | ${playerName}` : "",
-  certified: certified ? ` | ${certified}` : "",
-  company: company ? ` | ${company}` : "",
-  rank: rank ? `  ${rank}` : ""
-};
-
-
-  return OUTPUT_FORMAT
-    .replace("{rank}", parts.rank)
-    .replace("{company}", parts.company)
-    .replace("{certified}", parts.certified)
-    .replace("{playerName}", parts.playerName);
+  // عكسنا مكان الاسم مع الموقع فقط، مع بقاء لاعب معتمد والكود في نفس الترتيب.
+  return [company, certified, playerName, rank].filter(Boolean).join(" | ");
 }
 
 function showResult() {
