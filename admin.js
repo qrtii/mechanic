@@ -246,7 +246,7 @@
       toTime: formatTime(leaveFields.toTime),
       toPeriod: safeText(leaveFields.toPeriod, 'ص'),
       rulesLink: safeText(leaveFields.rulesLink, DEFAULT_LEAVE_RULES_LINK),
-      roleMention: safeText(leaveFields.roleMention, DEFAULT_ROLE_MENTION)
+      roleMention: ''
     };
   }
 
@@ -258,8 +258,7 @@
       '***من تاريخ ' + data.fromDate + ' ' + data.fromTime + ' ' + data.fromPeriod + '*** \n' +
       '***الى تاريخ ' + data.toDate + ' ' + data.toTime + ' ' + data.toPeriod + ' *** \n\n\n' +
       '***يجب قراءة كامل [قوانين الإجازات](' + data.rulesLink + ') والافادة بالاستلام بوضع رياكشن ***\n\n' +
-      '`جهلك بالقوانين لا يعفيك من العقوبة\n`*** \n' +
-      data.roleMention + '  ***';
+      '`جهلك بالقوانين لا يعفيك من العقوبة\n`*** \n';
   }
 
   function buildLeadershipRewardReport() {
@@ -273,8 +272,7 @@
       '***الى تاريخ ' + data.toDate + ' ' + data.toTime + ' ' + data.toPeriod + ' *** \n\n\n' +
       '***يجب قراءة كامل [قوانين الإجازات](' + data.rulesLink + ') والافادة بالاستلام بوضع رياكشن ***\n\n' +
       '`جهلك بالقوانين لا يعفيك من العقوبة\n`*** \n' +
-      '***`توقيع و اعتماد :` ' + signature + '***  \n\n' +
-      data.roleMention + '  ***';
+      '***`توقيع و اعتماد :` ' + signature + '***  \n\n';
   }
 
   function buildLeaveReport() {
@@ -295,8 +293,7 @@
       '***الى تاريخ ' + data.toDate + ' ' + data.toTime + ' ' + data.toPeriod + ' *** \n\n' +
       '***`الملاحظات :` ' + notes + '***\n\n' +
       '***يجب قراءة كامل [قوانين الإجازات](' + data.rulesLink + ') والافادة بالاستلام بوضع رياكشن ***\n\n' +
-      '`جهلك بالقوانين لا يعفيك من العقوبة\n`*** \n' +
-      data.roleMention + '  ***';
+      '`جهلك بالقوانين لا يعفيك من العقوبة\n`*** \n';
   }
 
   function buildAssignmentReport() {
