@@ -9,7 +9,6 @@
   var output = $('adminOutput');
   var DEFAULT_LEAVE_RULES_LINK = 'https://discord.com/channels/1071933157097615480/1071934713524133918/1500101205320536155';
   var DEFAULT_LEAVE_NOTES = 'يلزم الفني اكمال 24 ساعة من اخر اجازة و التأكد من المخالفات و تصفير الاجازات';
-  var DEFAULT_ROLE_MENTION = '<@&1149742928953086105>';
   var DEFAULT_OUTPUT_TEXT = 'سيظهر التقرير الإداري هنا بعد الضغط على إنشاء التقرير.';
 
   var forms = {
@@ -31,7 +30,6 @@
     toPeriod: $('leaveToPeriod'),
     rulesLink: $('leaveRulesLink'),
     notes: $('leaveNotes'),
-    roleMention: $('leaveRoleMention'),
     signature: $('rewardSignature')
   };
 
@@ -191,12 +189,6 @@
     }
   }
 
-  function ensureRoleMention() {
-    if (leaveFields.roleMention && !String(leaveFields.roleMention.value || '').trim()) {
-      leaveFields.roleMention.value = DEFAULT_ROLE_MENTION;
-    }
-  }
-
   function toggleElements(selector, hidden) {
     Array.prototype.forEach.call(document.querySelectorAll(selector), function (el) {
       el.classList.toggle('hidden', hidden);
@@ -232,7 +224,6 @@
 
   function getLeaveCommonData() {
     ensureLeaveRulesLink();
-    ensureRoleMention();
     formatMentionField(leaveFields.technician);
     formatMentionField(leaveFields.signature);
 
@@ -245,8 +236,7 @@
       toDate: formatDate(leaveFields.toDate),
       toTime: formatTime(leaveFields.toTime),
       toPeriod: safeText(leaveFields.toPeriod, 'ص'),
-      rulesLink: safeText(leaveFields.rulesLink, DEFAULT_LEAVE_RULES_LINK),
-      roleMention: ''
+      rulesLink: safeText(leaveFields.rulesLink, DEFAULT_LEAVE_RULES_LINK)
     };
   }
 
@@ -342,7 +332,6 @@
       setValue(leaveFields.toPeriod, 'ص');
       setValue(leaveFields.rulesLink, DEFAULT_LEAVE_RULES_LINK);
       setValue(leaveFields.notes, DEFAULT_LEAVE_NOTES);
-      setValue(leaveFields.roleMention, DEFAULT_ROLE_MENTION);
     }
 
     if (type === 'merchantLeave' || type === 'leadershipReward') {
@@ -357,7 +346,6 @@
       setValue(leaveFields.toTime, '00:00');
       setValue(leaveFields.toPeriod, 'م');
       setValue(leaveFields.rulesLink, DEFAULT_LEAVE_RULES_LINK);
-      setValue(leaveFields.roleMention, DEFAULT_ROLE_MENTION);
       if (type === 'leadershipReward') setValue(leaveFields.signature, '<@943708520648433674>');
     }
 
@@ -382,8 +370,7 @@
     if (section === 'leave') {
       ensureLeaveRulesLink();
       ensureLeaveNotes();
-      ensureRoleMention();
-    }
+      }
     if (output) output.value = DEFAULT_OUTPUT_TEXT;
     toast('تم مسح الخانات');
   }
@@ -435,7 +422,6 @@
 
   ensureLeaveRulesLink();
   ensureLeaveNotes();
-  ensureRoleMention();
   bindEvents();
   updateVisibleForm();
 }());
