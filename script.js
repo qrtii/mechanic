@@ -1,6 +1,6 @@
 // غيّر هذا النص إذا كنت تريد صيغة مختلفة للناتج النهائي.
 // المتغيرات المتاحة: {rank} {company} {certified} {playerName}
-const OUTPUT_FORMAT = "{rank}{certified}{playerName}{company} ";
+const OUTPUT_FORMAT = "{company}{certified}{playerName}{rank} ";
 
 const rankInput = document.getElementById("rank");
 const companyInput = document.getElementById("company");
