@@ -157,8 +157,8 @@ function buildSupervisionReport() {
   const fromPeriod = value(fields.fromPeriod, 'ص');
   const toTime = toTwelveHourTime(value(fields.toTime, '00:00'));
   const toPeriod = value(fields.toPeriod, 'ص');
-  const supervisionLink = value(fields.supervisionSubmitLink, 'لا يوجد');
-  const operationsLink = value(fields.operationsReportLink, 'لا يوجد');
+  const supervisionLink = String(fields.supervisionSubmitLink.value || '').trim();
+  const operationsLink = String(fields.operationsReportLink.value || '').trim();
 
   return `**تقرير رقم (${reportNumber})
 
