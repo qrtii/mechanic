@@ -289,22 +289,72 @@ function initAuditImagePreview() {
   const clearBtn = $('clearAuditImageBtn');
   const zoomInBtn = $('zoomInAuditImageBtn');
   const zoomOutBtn = $('zoomOutAuditImageBtn');
+  const resetGuideBtn = $('resetGuideLinesBtn');
+  const guide1 = $('auditGuide1');
+  const guide2 = $('auditGuide2');
+  const dimTop = $('auditDimTop');
+  const dimBottom = $('auditDimBottom');
   const previewBox = preview ? preview.closest('.audit-preview') : null;
 
-  if (!input || !preview || !placeholder || !clearBtn || !zoomInBtn || !zoomOutBtn) return;
+  if (!input || !preview || !placeholder || !clearBtn || !zoomInBtn || !zoomOutBtn || !previewBox || !guide1 || !guide2 || !dimTop || !dimBottom) return;
 
   let zoomLevel = 1;
   let offsetX = 0;
   let offsetY = 0;
-  let isDragging = false;
+  let isDraggingImage = false;
   let startX = 0;
   let startY = 0;
   let startOffsetX = 0;
   let startOffsetY = 0;
 
+  const defaultGuides = [30, 42];
+  const guidePositions = [defaultGuides[0], defaultGuides[1]];
+  let activeGuide = null;
+  let guideStartY = 0;
+  let guideStartPercent = 0;
+
   function applyImageView() {
     preview.style.width = `${zoomLevel * 100}%`;
     preview.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+  }
+
+  function applyGuideLines() {
+    [guide1, guide2].forEach((guide, index) => {
+      guide.style.top = `${guidePositions[index]}%`;
+    });
+    applyDimOverlay();
+  }
+
+  function applyDimOverlay() {
+    const upper = Math.min(guidePositions[0], guidePositions[1]);
+    const lower = Math.max(guidePositions[0], guidePositions[1]);
+
+    dimTop.style.top = '0';
+    dimTop.style.height = `${upper}%`;
+
+    dimBottom.style.top = `${lower}%`;
+    dimBottom.style.height = `${Math.max(0, 100 - lower)}%`;
+  }
+
+  function showGuideLines() {
+    guide1.classList.remove('hidden');
+    guide2.classList.remove('hidden');
+    dimTop.classList.remove('hidden');
+    dimBottom.classList.remove('hidden');
+    applyGuideLines();
+  }
+
+  function hideGuideLines() {
+    guide1.classList.add('hidden');
+    guide2.classList.add('hidden');
+    dimTop.classList.add('hidden');
+    dimBottom.classList.add('hidden');
+  }
+
+  function resetGuideLines() {
+    guidePositions[0] = defaultGuides[0];
+    guidePositions[1] = defaultGuides[1];
+    applyGuideLines();
   }
 
   function resetImageView() {
@@ -312,6 +362,7 @@ function initAuditImagePreview() {
     offsetX = 0;
     offsetY = 0;
     applyImageView();
+    resetGuideLines();
     if (previewBox) {
       previewBox.scrollTop = 0;
       previewBox.scrollLeft = 0;
@@ -325,7 +376,9 @@ function initAuditImagePreview() {
     preview.classList.remove('is-dragging');
     placeholder.classList.remove('hidden');
     placeholder.textContent = 'لم يتم اختيار صورة بعد';
-    isDragging = false;
+    isDraggingImage = false;
+    activeGuide = null;
+    hideGuideLines();
     resetImageView();
   }
 
@@ -347,6 +400,7 @@ function initAuditImagePreview() {
       preview.src = reader.result;
       preview.classList.remove('hidden');
       placeholder.classList.add('hidden');
+      showGuideLines();
       resetImageView();
       toast('تمت إضافة الصورة للتدقيق');
     };
@@ -373,7 +427,8 @@ function initAuditImagePreview() {
 
   preview.addEventListener('pointerdown', (event) => {
     if (preview.classList.contains('hidden')) return;
-    isDragging = true;
+    if (event.target === guide1 || event.target === guide2 || event.target.closest('.audit-guide')) return;
+    isDraggingImage = true;
     startX = event.clientX;
     startY = event.clientY;
     startOffsetX = offsetX;
@@ -384,32 +439,89 @@ function initAuditImagePreview() {
   });
 
   preview.addEventListener('pointermove', (event) => {
-    if (!isDragging) return;
+    if (!isDraggingImage) return;
     offsetX = startOffsetX + event.clientX - startX;
     offsetY = startOffsetY + event.clientY - startY;
     applyImageView();
   });
 
-  function stopDragging(event) {
-    if (!isDragging) return;
-    isDragging = false;
+  function stopImageDragging(event) {
+    if (!isDraggingImage) return;
+    isDraggingImage = false;
     preview.classList.remove('is-dragging');
     if (event && preview.hasPointerCapture(event.pointerId)) {
       preview.releasePointerCapture(event.pointerId);
     }
   }
 
-  preview.addEventListener('pointerup', stopDragging);
-  preview.addEventListener('pointercancel', stopDragging);
+  preview.addEventListener('pointerup', stopImageDragging);
+  preview.addEventListener('pointercancel', stopImageDragging);
   preview.addEventListener('lostpointercapture', () => {
-    isDragging = false;
+    isDraggingImage = false;
     preview.classList.remove('is-dragging');
+  });
+
+  function startGuideDrag(event, guide, index) {
+    if (preview.classList.contains('hidden')) {
+      toast('أضف صورة أولاً');
+      return;
+    }
+    activeGuide = { element: guide, index };
+    guideStartY = event.clientY;
+    guideStartPercent = guidePositions[index];
+    guide.classList.add('is-dragging');
+    guide.setPointerCapture(event.pointerId);
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  function onGuideMove(event) {
+    if (!activeGuide) return;
+    const rect = previewBox.getBoundingClientRect();
+    const deltaY = event.clientY - guideStartY;
+    const deltaPercent = (deltaY / Math.max(rect.height, 1)) * 100;
+    guidePositions[activeGuide.index] = Math.max(2, Math.min(98, guideStartPercent + deltaPercent));
+    applyGuideLines();
+  }
+
+  function stopGuideDrag(event) {
+    if (!activeGuide) return;
+    const { element } = activeGuide;
+    element.classList.remove('is-dragging');
+    if (event && element.hasPointerCapture && element.hasPointerCapture(event.pointerId)) {
+      element.releasePointerCapture(event.pointerId);
+    }
+    activeGuide = null;
+  }
+
+  [guide1, guide2].forEach((guide, index) => {
+    guide.addEventListener('pointerdown', (event) => startGuideDrag(event, guide, index));
+    guide.addEventListener('pointermove', onGuideMove);
+    guide.addEventListener('pointerup', stopGuideDrag);
+    guide.addEventListener('pointercancel', stopGuideDrag);
+    guide.addEventListener('lostpointercapture', () => {
+      guide.classList.remove('is-dragging');
+      activeGuide = null;
+    });
   });
 
   clearBtn.addEventListener('click', () => {
     clearPreview();
     toast('تم حذف الصورة');
   });
+
+  if (resetGuideBtn) {
+    resetGuideBtn.addEventListener('click', () => {
+      if (preview.classList.contains('hidden')) {
+        toast('أضف صورة أولاً');
+        return;
+      }
+      resetGuideLines();
+      toast('تمت إعادة ضبط الخطين');
+    });
+  }
+
+  hideGuideLines();
 }
 
 initAuditImagePreview();

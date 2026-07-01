@@ -38,16 +38,15 @@
           <button id="zoomInAuditImageBtn" class="primary" type="button">تكبير +</button>
           <button id="zoomOutAuditImageBtn" class="secondary" type="button">تصغير -</button>
           <button id="clearAuditImageBtn" class="danger" type="button">حذف الصورة</button>
+          <button id="resetGuideLinesBtn" class="secondary" type="button">إعادة ضبط الخطين</button>
         </div>
-        <div class="audit-help">بعد إضافة الصورة استخدم أزرار التكبير والتصغير، ويمكنك سحب الصورة بالماوس لتحريكها.</div>
-
-        <div class="ocr-tools" aria-label="استخراج الوحدات من صورة التقرير">
-          <button id="extractUnitsBtn" class="primary" type="button">استخراج الوحدات من الصورة</button>
-          <div id="ocrStatus" class="audit-help ocr-status">ارفع صورة واضحة ثم اضغط استخراج الوحدات. سيتم تعبئة خانات لوس، ساندي، بوليتو، وجزيرة بوليتو تلقائياً قدر الإمكان.</div>
-        </div>
-
+        <div class="audit-help">بعد إضافة الصورة استخدم أزرار التكبير والتصغير، ويمكنك سحب الصورة بالماوس لتحريكها. كذلك يمكنك استخدام خطين متحركين لتحديد الاسم بدقة وسحبهما لأعلى أو أسفل كل اسم.</div>
         <div class="audit-preview" aria-live="polite">
           <img id="auditPreview" class="hidden" alt="معاينة صورة التقرير" />
+          <div id="auditDimTop" class="audit-dim audit-dim-top hidden" aria-hidden="true"></div>
+          <div id="auditDimBottom" class="audit-dim audit-dim-bottom hidden" aria-hidden="true"></div>
+          <div id="auditGuide1" class="audit-guide hidden" aria-label="خط التدقيق الأول"><span>الخط 1</span></div>
+          <div id="auditGuide2" class="audit-guide hidden" aria-label="خط التدقيق الثاني"><span>الخط 2</span></div>
           <div id="auditPlaceholder" class="image-placeholder">لم يتم اختيار صورة بعد</div>
         </div>
       </aside>
@@ -225,7 +224,6 @@
   </main>
 
   <div id="toast" role="status" aria-live="polite"></div>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@latest/dist/tesseract.min.js"></script>
   <script src="report.js"></script>
 </body>
 </html>

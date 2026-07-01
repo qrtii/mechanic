@@ -529,3 +529,88 @@ textarea:focus {
   direction: rtl;
   text-align: right;
 }
+
+
+.audit-guide {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 30%;
+  height: 0;
+  border-top: 2px dashed #ffd86e;
+  z-index: 4;
+  cursor: ns-resize;
+  touch-action: none;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
+}
+
+.audit-guide::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: -6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffd86e;
+  box-shadow: 0 0 0 3px rgba(255, 216, 110, 0.18);
+}
+
+.audit-guide span {
+  position: absolute;
+  left: 18px;
+  top: -16px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #111827;
+  background: #ffd86e;
+  padding: 3px 10px;
+  border-radius: 999px;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.audit-guide.is-dragging {
+  border-top-style: solid;
+}
+
+.audit-preview {
+  position: relative;
+  overflow: hidden;
+}
+
+.audit-preview img {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 720px) {
+  .audit-guide span {
+    font-size: 0.74rem;
+    padding: 3px 8px;
+  }
+}
+
+
+.audit-dim {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.58);
+  pointer-events: none;
+}
+
+.audit-dim-top {
+  top: 0;
+  height: 30%;
+}
+
+.audit-dim-bottom {
+  top: 42%;
+  bottom: 0;
+}
+
+.audit-guide {
+  z-index: 5;
+}
