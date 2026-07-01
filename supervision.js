@@ -1,5 +1,78 @@
 const $ = (id) => document.getElementById(id);
 
+function value(input, fallback = 'لا يوجد') {
+  const text = input ? String(input.value || '').trim() : '';
+  return text.length ? text : fallback;
+}
+
+function normalizeDigits(text) {
+  const map = {
+    '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4',
+    '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9',
+    '۰': '0', '۱': '1', '۲': '2', '۳': '3', '۴': '4',
+    '۵': '5', '۶': '6', '۷': '7', '۸': '8', '۹': '9'
+  };
+  return String(text || '').replace(/[٠-٩۰-۹]/g, (digit) => map[digit] || digit);
+}
+
+function toTwelveHourTime(rawTime, fallback = '00:00') {
+  const text = normalizeDigits(String(rawTime || '').trim() || fallback);
+  const match = text.match(/^(\d{1,2})\s*[:：]\s*(\d{1,2})/);
+  if (!match) return text || '12:00';
+
+  let hour = Number(match[1]);
+  let minute = Number(match[2]);
+  if (Number.isNaN(hour)) hour = 0;
+  if (Number.isNaN(minute)) minute = 0;
+
+  hour = ((hour % 24) + 24) % 24;
+  minute = Math.max(0, Math.min(59, minute));
+
+  let hour12 = hour % 12;
+  if (hour12 === 0) hour12 = 12;
+
+  return String(hour12).padStart(2, '0') + ':' + String(minute).padStart(2, '0');
+}
+
+function convertDiscordIdsToMentions(text) {
+  const placeholders = [];
+  let working = normalizeDigits(String(text || ''));
+
+  working = working.replace(/<@&?!?\d{15,25}>|<@!?\d{15,25}>/g, (mention) => {
+    const token = `__MENTION_${placeholders.length}__`;
+    placeholders.push(mention);
+    return token;
+  });
+
+  working = working.replace(/\b\d{15,25}\b/g, (id) => `<@${id}>`);
+
+  placeholders.forEach((mention, index) => {
+    working = working.replace(`__MENTION_${index}__`, mention);
+  });
+
+  return working.trim();
+}
+
+function formatMentionField(input) {
+  if (!input) return;
+  input.value = convertDiscordIdsToMentions(input.value);
+}
+
+function inBrackets(text) {
+  const clean = String(text || '').trim() || 'لا يوجد';
+  if (clean.startsWith('(') && clean.endsWith(')')) return clean;
+  return `( ${clean} )`;
+}
+
+function toast(message) {
+  const box = $('toast');
+  if (!box) return;
+  box.textContent = message;
+  box.classList.add('show');
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => box.classList.remove('show'), 1800);
+}
+
 const fields = {
   reportNumber: $('superReportNumber'),
   fromTime: $('superFromTime'),
@@ -27,89 +100,7 @@ const fields = {
   output: $('supervisionOutput')
 };
 
-const FALLBACKS = {
-  leadership: 'لا يوجد',
-  leaderAdvisor: 'لا يوجد',
-  generalSupervision: 'لا يوجد',
-  fieldSupervision: 'لا يوجد',
-  areaSupervision: 'لا يوجد',
-  traineeSupervision: 'لا يوجد',
-  certifiedLadies: 'لا يوجد',
-  storeOpeningOfficer: 'لا يوجد',
-  garageRoomFieldSupervisor: 'لا يوجد',
-  garageRoomAreaSupervisor: 'لا يوجد',
-  garageRoomTraineeSupervisor: 'لا يوجد',
-  operations: 'لا يوجد',
-  deputyOperations: 'لا يوجد',
-  callCenter: 'لا يوجد',
-  losPort: 'لا يوجد',
-  paletoPort: 'لا يوجد'
-};
-
-const divider = 'ــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــ';
-
-function value(input, fallback = 'لا يوجد') {
-  const text = String(input.value || '').trim();
-  return text.length ? text : fallback;
-}
-
-function toTwelveHourTime(rawTime, fallback = '00:00') {
-  const text = normalizeDigits(String(rawTime || '').trim() || fallback);
-  const match = text.match(/^(\d{1,2})\s*[:：]\s*(\d{1,2})/);
-  if (!match) return text || '12:00';
-
-  let hour = Number(match[1]);
-  let minute = Number(match[2]);
-  if (Number.isNaN(hour)) hour = 0;
-  if (Number.isNaN(minute)) minute = 0;
-
-  hour = ((hour % 24) + 24) % 24;
-  minute = Math.max(0, Math.min(59, minute));
-
-  let hour12 = hour % 12;
-  if (hour12 === 0) hour12 = 12;
-
-  return String(hour12).padStart(2, '0') + ':' + String(minute).padStart(2, '0');
-}
-
-
-function normalizeDigits(text) {
-  const map = {
-    '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4',
-    '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9',
-    '۰': '0', '۱': '1', '۲': '2', '۳': '3', '۴': '4',
-    '۵': '5', '۶': '6', '۷': '7', '۸': '8', '۹': '9'
-  };
-  return String(text || '').replace(/[٠-٩۰-۹]/g, (digit) => map[digit] || digit);
-}
-
-function convertDiscordIdsToMentions(text) {
-  const placeholders = [];
-  let working = normalizeDigits(String(text || ''));
-
-  // لا نغيّر المنشنات الجاهزة سواء كانت منشن شخص أو رتبة.
-  working = working.replace(/<@&?!?\d{15,25}>|<@!?\d{15,25}>/g, (mention) => {
-    const token = `__MENTION_${placeholders.length}__`;
-    placeholders.push(mention);
-    return token;
-  });
-
-  // أي Copy ID رقمي يتم تحويله تلقائياً إلى منشن ديسكورد.
-  working = working.replace(/\b\d{15,25}\b/g, (id) => `<@${id}>`);
-
-  placeholders.forEach((mention, index) => {
-    working = working.replace(`__MENTION_${index}__`, mention);
-  });
-
-  return working.trim();
-}
-
-function formatMentionField(input) {
-  if (!input) return;
-  input.value = convertDiscordIdsToMentions(input.value);
-}
-
-const supervisionMentionFields = [
+const mentionFields = [
   fields.leadership,
   fields.leaderAdvisor,
   fields.generalSupervision,
@@ -128,91 +119,77 @@ const supervisionMentionFields = [
   fields.paletoPort
 ];
 
-function formatSupervisionMentions() {
-  supervisionMentionFields.forEach(formatMentionField);
-}
+const divider = 'ــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــ';
 
-function inBrackets(text) {
-  const clean = String(text || '').trim();
-  if (clean.startsWith('(') && clean.endsWith(')')) return clean;
-  return `( ${clean} )`;
-}
-
-function namedValue(key) {
-  return inBrackets(value(fields[key], FALLBACKS[key] || 'لا يوجد'));
-}
-
-function toast(message) {
-  const box = $('toast');
-  box.textContent = message;
-  box.classList.add('show');
-  clearTimeout(toast.timer);
-  toast.timer = setTimeout(() => box.classList.remove('show'), 1800);
+function named(input) {
+  return inBrackets(value(input, 'لا يوجد'));
 }
 
 function buildSupervisionReport() {
-  formatSupervisionMentions();
+  mentionFields.forEach(formatMentionField);
+
   const reportNumber = value(fields.reportNumber, '00');
   const fromTime = toTwelveHourTime(value(fields.fromTime, '00:00'));
-  const fromPeriod = value(fields.fromPeriod, 'ص');
+  const fromPeriod = value(fields.fromPeriod, 'ص/م');
   const toTime = toTwelveHourTime(value(fields.toTime, '00:00'));
-  const toPeriod = value(fields.toPeriod, 'ص');
-  const supervisionLink = String(fields.supervisionSubmitLink.value || '').trim();
-  const operationsLink = String(fields.operationsReportLink.value || '').trim();
+  const toPeriod = value(fields.toPeriod, 'ص/م');
+  const supervisionLink = String(fields.supervisionSubmitLink ? fields.supervisionSubmitLink.value : '').trim();
+  const operationsLink = String(fields.operationsReportLink ? fields.operationsReportLink.value : '').trim();
 
-  return `**تقرير رقم (${reportNumber})
+  return `**تقرير رقم (${reportNumber})**
 
-تم استلام تقرير المشرفين من الساعة (${fromTime} ${fromPeriod}) الى الساعة (${toTime} ${toPeriod})
-
-${divider}
-القيادة: ${namedValue('leadership')}
-
-مستشار القائد: ${namedValue('leaderAdvisor')}
-${divider}
-اشراف عام: ${namedValue('generalSupervision')}
-
-اشراف ميداني: ${namedValue('fieldSupervision')}
-
-اشراف المناطق: ${namedValue('areaSupervision')}
-
-مشرفين متدربين: ${namedValue('traineeSupervision')}
-
-لاعب معتمد والسيدات: ${namedValue('certifiedLadies')}
-${divider}
-مسؤول افتتاح المتجر : ${namedValue('storeOpeningOfficer')}
-
-المشرف الميداني بروم الكراج: ${namedValue('garageRoomFieldSupervisor')}
-
-مشرف المنطقة بروم الكراج: ${namedValue('garageRoomAreaSupervisor')}
-
-مشرف المتدرب بروم الكراج: ${namedValue('garageRoomTraineeSupervisor')}
-${divider}
-
-العمليات: ${namedValue('operations')}
-
-نائب العمليات: ${namedValue('deputyOperations')}
-
-مركز الاتصالات: ${namedValue('callCenter')}
-
-فني ميناء لوس: ${namedValue('losPort')}
-
-فني ميناء بوليتو: ${namedValue('paletoPort')}
-${divider}
-
-[تسليم تقرير الاشراف](${supervisionLink})
-[تقرير العمليات](${operationsLink})
+**تم استلام تقرير المشرفين من الساعة  ( ${fromTime} ${fromPeriod} )  الى الساعة  ( ${toTime} ${toPeriod})**
 
 ${divider}
-**`;
+**القيادة : ${named(fields.leadership)}**
+
+**مستشار القائد : ${named(fields.leaderAdvisor)}**
+${divider}
+**اشراف عام : ${named(fields.generalSupervision)}**
+
+**اشراف ميداني :  ${named(fields.fieldSupervision)} **
+
+**اشراف المناطق : ${named(fields.areaSupervision)}**
+
+**مشرفين متدربين : ${named(fields.traineeSupervision)}**
+
+**لاعب معتمد والسيدات : ${named(fields.certifiedLadies)}**
+${divider}
+**مسؤول افتتاح المتجر : ${named(fields.storeOpeningOfficer)}**
+
+**المشرف الميداني بروم الكراج : ${named(fields.garageRoomFieldSupervisor)}**
+
+**مشرف المنطقة بروم الكراج :   ${named(fields.garageRoomAreaSupervisor)}**
+
+**مشرف المتدرب بروم الكراج :  ${named(fields.garageRoomTraineeSupervisor)}**
+${divider}
+
+**العمليات: ${named(fields.operations)}**
+
+**نائب العمليات : ${named(fields.deputyOperations)} **
+
+**مركز الإتصالات :  ${named(fields.callCenter)}**
+
+**فني ميناء لوس: ${named(fields.losPort)}**
+
+**فني ميناء بوليتو : ${named(fields.paletoPort)}**
+
+${divider}
+
+ **[تسليم تقرير الاشراف](${supervisionLink})**
+**[تقرير العمليات](${operationsLink}) **
+
+${divider}`;
 }
 
 function generateSupervisionReport() {
+  if (!fields.output) return;
   fields.output.value = buildSupervisionReport();
   toast('تم إنشاء تقرير الإشراف');
 }
 
 async function copySupervisionReport() {
-  if (!fields.output.value || fields.output.value.includes('سيظهر تقرير الإشراف')) {
+  if (!fields.output || !fields.output.value || fields.output.value.includes('سيظهر تقرير الإشراف')) {
     generateSupervisionReport();
   }
 
@@ -247,34 +224,36 @@ function fillExample() {
   fields.deputyOperations.value = '<@921536232805240873>';
   fields.callCenter.value = '<@734866411456823317>';
   fields.losPort.value = 'لا يوجد';
-  fields.paletoPort.value = '<@1328735995444723763>';.value = 'لا يوجد';
-  fields.supervisionSubmitLink.value = '';
-  fields.operationsReportLink.value = '';
+  fields.paletoPort.value = '<@1328735995444723763>';
+  fields.supervisionSubmitLink.value = 'https://canary.discord.com/channels/1071933157097615480/1233153085841346673';
+  fields.operationsReportLink.value = 'https://canary.discord.com/channels/1071933157097615480/1071934769530683492';
   generateSupervisionReport();
 }
 
 function clearFields() {
   Object.entries(fields).forEach(([key, input]) => {
-    if (key !== 'output') input.value = '';
+    if (key !== 'output' && input) input.value = '';
   });
-  fields.reportNumber.value = '00';
+  fields.reportNumber.value = '';
   fields.fromTime.value = '12:00';
   fields.toTime.value = '12:00';
   fields.fromPeriod.value = 'ص';
   fields.toPeriod.value = 'ص';
-  fields.supervisionSubmitLink.value = '';
-  fields.operationsReportLink.value = '';
   fields.output.value = 'سيظهر تقرير الإشراف هنا بعد الضغط على إنشاء التقرير.';
   toast('تم مسح خانات تقرير الإشراف');
 }
 
-$('generateSupervisionBtn').addEventListener('click', generateSupervisionReport);
-$('copySupervisionBtn').addEventListener('click', copySupervisionReport);
-$('exampleSupervisionBtn').addEventListener('click', fillExample);
-$('clearSupervisionBtn').addEventListener('click', clearFields);
+function initSupervisionButtons() {
+  const generateBtn = $('generateSupervisionBtn');
+  const copyBtn = $('copySupervisionBtn');
+  const exampleBtn = $('exampleSupervisionBtn');
+  const clearBtn = $('clearSupervisionBtn');
 
-generateSupervisionReport();
-
+  if (generateBtn) generateBtn.addEventListener('click', generateSupervisionReport);
+  if (copyBtn) copyBtn.addEventListener('click', copySupervisionReport);
+  if (exampleBtn) exampleBtn.addEventListener('click', fillExample);
+  if (clearBtn) clearBtn.addEventListener('click', clearFields);
+}
 
 function initAuditImagePreview() {
   const input = $('auditImage');
@@ -312,13 +291,6 @@ function initAuditImagePreview() {
     preview.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
   }
 
-  function applyGuideLines() {
-    [guide1, guide2].forEach((guide, index) => {
-      guide.style.top = `${guidePositions[index]}%`;
-    });
-    applyDimOverlay();
-  }
-
   function applyDimOverlay() {
     const upper = Math.min(guidePositions[0], guidePositions[1]);
     const lower = Math.max(guidePositions[0], guidePositions[1]);
@@ -328,6 +300,13 @@ function initAuditImagePreview() {
 
     dimBottom.style.top = `${lower}%`;
     dimBottom.style.height = `${Math.max(0, 100 - lower)}%`;
+  }
+
+  function applyGuideLines() {
+    [guide1, guide2].forEach((guide, index) => {
+      guide.style.top = `${guidePositions[index]}%`;
+    });
+    applyDimOverlay();
   }
 
   function showGuideLines() {
@@ -357,10 +336,8 @@ function initAuditImagePreview() {
     offsetY = 0;
     applyImageView();
     resetGuideLines();
-    if (previewBox) {
-      previewBox.scrollTop = 0;
-      previewBox.scrollLeft = 0;
-    }
+    previewBox.scrollTop = 0;
+    previewBox.scrollLeft = 0;
   }
 
   function clearPreview() {
@@ -421,7 +398,7 @@ function initAuditImagePreview() {
 
   preview.addEventListener('pointerdown', (event) => {
     if (preview.classList.contains('hidden')) return;
-    if (event.target === guide1 || event.target === guide2 || event.target.closest('.audit-guide')) return;
+    if (event.target.closest && event.target.closest('.audit-guide')) return;
     isDraggingImage = true;
     startX = event.clientX;
     startY = event.clientY;
@@ -518,4 +495,7 @@ function initAuditImagePreview() {
   hideGuideLines();
 }
 
-initAuditImagePreview();
+document.addEventListener('DOMContentLoaded', () => {
+  initSupervisionButtons();
+  initAuditImagePreview();
+});
