@@ -202,10 +202,10 @@
       </div>
 
       <div class="button-row">
-        <button id="generateSupervisionBtn" class="primary" type="button">إنشاء تقرير الإشراف</button>
-        <button id="copySupervisionBtn" class="secondary" type="button">نسخ التقرير</button>
-        <button id="exampleSupervisionBtn" class="ghost" type="button">تعبئة مثال</button>
-        <button id="clearSupervisionBtn" class="danger" type="button">مسح الخانات</button>
+        <button id="generateSupervisionBtn" class="primary" type="button" onclick="generateSupervisionReport()">إنشاء تقرير الإشراف</button>
+        <button id="copySupervisionBtn" class="secondary" type="button" onclick="copySupervisionReport()">نسخ التقرير</button>
+        <button id="exampleSupervisionBtn" class="ghost" type="button" onclick="fillExample()">تعبئة مثال</button>
+        <button id="clearSupervisionBtn" class="danger" type="button" onclick="clearFields()">مسح الخانات</button>
       </div>
 
       <div class="field result-wrap">
@@ -217,6 +217,520 @@
   </main>
 
   <div id="toast" role="status" aria-live="polite"></div>
-  <script src="supervision.js"></script>
+  <script>
+const $ = (id) => document.getElementById(id);
+
+function value(input, fallback = 'لا يوجد') {
+  const text = input ? String(input.value || '').trim() : '';
+  return text.length ? text : fallback;
+}
+
+function normalizeDigits(text) {
+  const map = {
+    '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4',
+    '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9',
+    '۰': '0', '۱': '1', '۲': '2', '۳': '3', '۴': '4',
+    '۵': '5', '۶': '6', '۷': '7', '۸': '8', '۹': '9'
+  };
+  return String(text || '').replace(/[٠-٩۰-۹]/g, (digit) => map[digit] || digit);
+}
+
+function toTwelveHourTime(rawTime, fallback = '00:00') {
+  const text = normalizeDigits(String(rawTime || '').trim() || fallback);
+  const match = text.match(/^(\d{1,2})\s*[:：]\s*(\d{1,2})/);
+  if (!match) return text || '12:00';
+
+  let hour = Number(match[1]);
+  let minute = Number(match[2]);
+  if (Number.isNaN(hour)) hour = 0;
+  if (Number.isNaN(minute)) minute = 0;
+
+  hour = ((hour % 24) + 24) % 24;
+  minute = Math.max(0, Math.min(59, minute));
+
+  let hour12 = hour % 12;
+  if (hour12 === 0) hour12 = 12;
+
+  return String(hour12).padStart(2, '0') + ':' + String(minute).padStart(2, '0');
+}
+
+function convertDiscordIdsToMentions(text) {
+  const placeholders = [];
+  let working = normalizeDigits(String(text || ''));
+
+  working = working.replace(/<@&?!?\d{15,25}>|<@!?\d{15,25}>/g, (mention) => {
+    const token = `__MENTION_${placeholders.length}__`;
+    placeholders.push(mention);
+    return token;
+  });
+
+  working = working.replace(/\b\d{15,25}\b/g, (id) => `<@${id}>`);
+
+  placeholders.forEach((mention, index) => {
+    working = working.replace(`__MENTION_${index}__`, mention);
+  });
+
+  return working.trim();
+}
+
+function formatMentionField(input) {
+  if (!input) return;
+  input.value = convertDiscordIdsToMentions(input.value);
+}
+
+function inBrackets(text) {
+  const clean = String(text || '').trim() || 'لا يوجد';
+  if (clean.startsWith('(') && clean.endsWith(')')) return clean;
+  return `( ${clean} )`;
+}
+
+function toast(message) {
+  const box = $('toast');
+  if (!box) return;
+  box.textContent = message;
+  box.classList.add('show');
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => box.classList.remove('show'), 1800);
+}
+
+const fields = {
+  reportNumber: $('superReportNumber'),
+  fromTime: $('superFromTime'),
+  fromPeriod: $('superFromPeriod'),
+  toTime: $('superToTime'),
+  toPeriod: $('superToPeriod'),
+  leadership: $('leadership'),
+  leaderAdvisor: $('leaderAdvisor'),
+  generalSupervision: $('generalSupervision'),
+  fieldSupervision: $('fieldSupervision'),
+  areaSupervision: $('areaSupervision'),
+  traineeSupervision: $('traineeSupervision'),
+  certifiedLadies: $('certifiedLadies'),
+  storeOpeningOfficer: $('storeOpeningOfficer'),
+  garageRoomFieldSupervisor: $('garageRoomFieldSupervisor'),
+  garageRoomAreaSupervisor: $('garageRoomAreaSupervisor'),
+  garageRoomTraineeSupervisor: $('garageRoomTraineeSupervisor'),
+  operations: $('superOperations'),
+  deputyOperations: $('superDeputyOperations'),
+  callCenter: $('superCallCenter'),
+  losPort: $('superLosPort'),
+  paletoPort: $('superPaletoPort'),
+  supervisionSubmitLink: $('supervisionSubmitLink'),
+  operationsReportLink: $('operationsReportLink'),
+  output: $('supervisionOutput')
+};
+
+const mentionFields = [
+  fields.leadership,
+  fields.leaderAdvisor,
+  fields.generalSupervision,
+  fields.fieldSupervision,
+  fields.areaSupervision,
+  fields.traineeSupervision,
+  fields.certifiedLadies,
+  fields.storeOpeningOfficer,
+  fields.garageRoomFieldSupervisor,
+  fields.garageRoomAreaSupervisor,
+  fields.garageRoomTraineeSupervisor,
+  fields.operations,
+  fields.deputyOperations,
+  fields.callCenter,
+  fields.losPort,
+  fields.paletoPort
+];
+
+const divider = 'ــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــ';
+
+function named(input) {
+  return inBrackets(value(input, 'لا يوجد'));
+}
+
+function buildSupervisionReport() {
+  mentionFields.forEach(formatMentionField);
+
+  const reportNumber = value(fields.reportNumber, '00');
+  const fromTime = toTwelveHourTime(value(fields.fromTime, '00:00'));
+  const fromPeriod = value(fields.fromPeriod, 'ص/م');
+  const toTime = toTwelveHourTime(value(fields.toTime, '00:00'));
+  const toPeriod = value(fields.toPeriod, 'ص/م');
+  const supervisionLink = String(fields.supervisionSubmitLink ? fields.supervisionSubmitLink.value : '').trim();
+  const operationsLink = String(fields.operationsReportLink ? fields.operationsReportLink.value : '').trim();
+
+  return `**تقرير رقم (${reportNumber})**
+
+**تم استلام تقرير المشرفين من الساعة  ( ${fromTime} ${fromPeriod} )  الى الساعة  ( ${toTime} ${toPeriod})**
+
+${divider}
+**القيادة : ${named(fields.leadership)}**
+
+**مستشار القائد : ${named(fields.leaderAdvisor)}**
+${divider}
+**اشراف عام : ${named(fields.generalSupervision)}**
+
+**اشراف ميداني :  ${named(fields.fieldSupervision)} **
+
+**اشراف المناطق : ${named(fields.areaSupervision)}**
+
+**مشرفين متدربين : ${named(fields.traineeSupervision)}**
+
+**لاعب معتمد والسيدات : ${named(fields.certifiedLadies)}**
+${divider}
+**مسؤول افتتاح المتجر : ${named(fields.storeOpeningOfficer)}**
+
+**المشرف الميداني بروم الكراج : ${named(fields.garageRoomFieldSupervisor)}**
+
+**مشرف المنطقة بروم الكراج :   ${named(fields.garageRoomAreaSupervisor)}**
+
+**مشرف المتدرب بروم الكراج :  ${named(fields.garageRoomTraineeSupervisor)}**
+${divider}
+
+**العمليات: ${named(fields.operations)}**
+
+**نائب العمليات : ${named(fields.deputyOperations)} **
+
+**مركز الإتصالات :  ${named(fields.callCenter)}**
+
+**فني ميناء لوس: ${named(fields.losPort)}**
+
+**فني ميناء بوليتو : ${named(fields.paletoPort)}**
+
+${divider}
+
+ **[تسليم تقرير الاشراف](${supervisionLink})**
+**[تقرير العمليات](${operationsLink}) **
+
+${divider}`;
+}
+
+function generateSupervisionReport() {
+  if (!fields.output) return;
+  fields.output.value = buildSupervisionReport();
+  toast('تم إنشاء تقرير الإشراف');
+}
+
+async function copySupervisionReport() {
+  if (!fields.output || !fields.output.value || fields.output.value.includes('سيظهر تقرير الإشراف')) {
+    generateSupervisionReport();
+  }
+
+  try {
+    await navigator.clipboard.writeText(fields.output.value);
+    toast('تم نسخ تقرير الإشراف');
+  } catch (error) {
+    fields.output.select();
+    document.execCommand('copy');
+    toast('تم نسخ تقرير الإشراف');
+  }
+}
+
+function fillExample() {
+  fields.reportNumber.value = '5';
+  fields.fromTime.value = '08:00';
+  fields.fromPeriod.value = 'م';
+  fields.toTime.value = '09:00';
+  fields.toPeriod.value = 'م';
+  fields.leadership.value = '<@680393068469682256> <@1282062186579230792>';
+  fields.leaderAdvisor.value = '<@1347310064977055834>';
+  fields.generalSupervision.value = '<@1129397195116920863>';
+  fields.fieldSupervision.value = '<@662779880097710080> <@457633781004894208>';
+  fields.areaSupervision.value = '<@1459966470694899898> <@834199649949843467>';
+  fields.traineeSupervision.value = 'لا يوجد';
+  fields.certifiedLadies.value = '<@1265300539701334032>';
+  fields.storeOpeningOfficer.value = 'لا يوجد';
+  fields.garageRoomFieldSupervisor.value = 'لا يوجد';
+  fields.garageRoomAreaSupervisor.value = 'لا يوجد';
+  fields.garageRoomTraineeSupervisor.value = 'لا يوجد';
+  fields.operations.value = '<@762015936885555221>';
+  fields.deputyOperations.value = '<@921536232805240873>';
+  fields.callCenter.value = '<@734866411456823317>';
+  fields.losPort.value = 'لا يوجد';
+  fields.paletoPort.value = '<@1328735995444723763>';
+  fields.supervisionSubmitLink.value = 'https://canary.discord.com/channels/1071933157097615480/1233153085841346673';
+  fields.operationsReportLink.value = 'https://canary.discord.com/channels/1071933157097615480/1071934769530683492';
+  generateSupervisionReport();
+}
+
+function clearFields() {
+  Object.entries(fields).forEach(([key, input]) => {
+    if (key !== 'output' && input) input.value = '';
+  });
+  fields.reportNumber.value = '';
+  fields.fromTime.value = '12:00';
+  fields.toTime.value = '12:00';
+  fields.fromPeriod.value = 'ص';
+  fields.toPeriod.value = 'ص';
+  fields.output.value = 'سيظهر تقرير الإشراف هنا بعد الضغط على إنشاء التقرير.';
+  toast('تم مسح خانات تقرير الإشراف');
+}
+
+function initSupervisionButtons() {
+  const generateBtn = $('generateSupervisionBtn');
+  const copyBtn = $('copySupervisionBtn');
+  const exampleBtn = $('exampleSupervisionBtn');
+  const clearBtn = $('clearSupervisionBtn');
+
+  if (generateBtn) generateBtn.addEventListener('click', generateSupervisionReport);
+  if (copyBtn) copyBtn.addEventListener('click', copySupervisionReport);
+  if (exampleBtn) exampleBtn.addEventListener('click', fillExample);
+  if (clearBtn) clearBtn.addEventListener('click', clearFields);
+}
+
+function initAuditImagePreview() {
+  const input = $('auditImage');
+  const preview = $('auditPreview');
+  const placeholder = $('auditPlaceholder');
+  const clearBtn = $('clearAuditImageBtn');
+  const zoomInBtn = $('zoomInAuditImageBtn');
+  const zoomOutBtn = $('zoomOutAuditImageBtn');
+  const resetGuideBtn = $('resetGuideLinesBtn');
+  const guide1 = $('auditGuide1');
+  const guide2 = $('auditGuide2');
+  const dimTop = $('auditDimTop');
+  const dimBottom = $('auditDimBottom');
+  const previewBox = preview ? preview.closest('.audit-preview') : null;
+
+  if (!input || !preview || !placeholder || !clearBtn || !zoomInBtn || !zoomOutBtn || !previewBox || !guide1 || !guide2 || !dimTop || !dimBottom) return;
+
+  let zoomLevel = 1;
+  let offsetX = 0;
+  let offsetY = 0;
+  let isDraggingImage = false;
+  let startX = 0;
+  let startY = 0;
+  let startOffsetX = 0;
+  let startOffsetY = 0;
+
+  const defaultGuides = [30, 42];
+  const guidePositions = [defaultGuides[0], defaultGuides[1]];
+  let activeGuide = null;
+  let guideStartY = 0;
+  let guideStartPercent = 0;
+
+  function applyImageView() {
+    preview.style.width = `${zoomLevel * 100}%`;
+    preview.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+  }
+
+  function applyDimOverlay() {
+    const upper = Math.min(guidePositions[0], guidePositions[1]);
+    const lower = Math.max(guidePositions[0], guidePositions[1]);
+
+    dimTop.style.top = '0';
+    dimTop.style.height = `${upper}%`;
+
+    dimBottom.style.top = `${lower}%`;
+    dimBottom.style.height = `${Math.max(0, 100 - lower)}%`;
+  }
+
+  function applyGuideLines() {
+    [guide1, guide2].forEach((guide, index) => {
+      guide.style.top = `${guidePositions[index]}%`;
+    });
+    applyDimOverlay();
+  }
+
+  function showGuideLines() {
+    guide1.classList.remove('hidden');
+    guide2.classList.remove('hidden');
+    dimTop.classList.remove('hidden');
+    dimBottom.classList.remove('hidden');
+    applyGuideLines();
+  }
+
+  function hideGuideLines() {
+    guide1.classList.add('hidden');
+    guide2.classList.add('hidden');
+    dimTop.classList.add('hidden');
+    dimBottom.classList.add('hidden');
+  }
+
+  function resetGuideLines() {
+    guidePositions[0] = defaultGuides[0];
+    guidePositions[1] = defaultGuides[1];
+    applyGuideLines();
+  }
+
+  function resetImageView() {
+    zoomLevel = 1;
+    offsetX = 0;
+    offsetY = 0;
+    applyImageView();
+    resetGuideLines();
+    previewBox.scrollTop = 0;
+    previewBox.scrollLeft = 0;
+  }
+
+  function clearPreview() {
+    input.value = '';
+    preview.removeAttribute('src');
+    preview.classList.add('hidden');
+    preview.classList.remove('is-dragging');
+    placeholder.classList.remove('hidden');
+    placeholder.textContent = 'لم يتم اختيار صورة بعد';
+    isDraggingImage = false;
+    activeGuide = null;
+    hideGuideLines();
+    resetImageView();
+  }
+
+  input.addEventListener('change', () => {
+    const file = input.files && input.files[0];
+    if (!file) {
+      clearPreview();
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      clearPreview();
+      toast('يرجى اختيار صورة فقط');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      preview.src = reader.result;
+      preview.classList.remove('hidden');
+      placeholder.classList.add('hidden');
+      showGuideLines();
+      resetImageView();
+      toast('تمت إضافة الصورة للتدقيق');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  zoomInBtn.addEventListener('click', () => {
+    if (preview.classList.contains('hidden')) {
+      toast('أضف صورة أولاً');
+      return;
+    }
+    zoomLevel = Math.min(zoomLevel + 0.25, 3);
+    applyImageView();
+  });
+
+  zoomOutBtn.addEventListener('click', () => {
+    if (preview.classList.contains('hidden')) {
+      toast('أضف صورة أولاً');
+      return;
+    }
+    zoomLevel = Math.max(zoomLevel - 0.25, 0.5);
+    applyImageView();
+  });
+
+  preview.addEventListener('pointerdown', (event) => {
+    if (preview.classList.contains('hidden')) return;
+    if (event.target.closest && event.target.closest('.audit-guide')) return;
+    isDraggingImage = true;
+    startX = event.clientX;
+    startY = event.clientY;
+    startOffsetX = offsetX;
+    startOffsetY = offsetY;
+    preview.classList.add('is-dragging');
+    preview.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  });
+
+  preview.addEventListener('pointermove', (event) => {
+    if (!isDraggingImage) return;
+    offsetX = startOffsetX + event.clientX - startX;
+    offsetY = startOffsetY + event.clientY - startY;
+    applyImageView();
+  });
+
+  function stopImageDragging(event) {
+    if (!isDraggingImage) return;
+    isDraggingImage = false;
+    preview.classList.remove('is-dragging');
+    if (event && preview.hasPointerCapture(event.pointerId)) {
+      preview.releasePointerCapture(event.pointerId);
+    }
+  }
+
+  preview.addEventListener('pointerup', stopImageDragging);
+  preview.addEventListener('pointercancel', stopImageDragging);
+  preview.addEventListener('lostpointercapture', () => {
+    isDraggingImage = false;
+    preview.classList.remove('is-dragging');
+  });
+
+  function startGuideDrag(event, guide, index) {
+    if (preview.classList.contains('hidden')) {
+      toast('أضف صورة أولاً');
+      return;
+    }
+    activeGuide = { element: guide, index };
+    guideStartY = event.clientY;
+    guideStartPercent = guidePositions[index];
+    guide.classList.add('is-dragging');
+    guide.setPointerCapture(event.pointerId);
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  function onGuideMove(event) {
+    if (!activeGuide) return;
+    const rect = previewBox.getBoundingClientRect();
+    const deltaY = event.clientY - guideStartY;
+    const deltaPercent = (deltaY / Math.max(rect.height, 1)) * 100;
+    guidePositions[activeGuide.index] = Math.max(2, Math.min(98, guideStartPercent + deltaPercent));
+    applyGuideLines();
+  }
+
+  function stopGuideDrag(event) {
+    if (!activeGuide) return;
+    const { element } = activeGuide;
+    element.classList.remove('is-dragging');
+    if (event && element.hasPointerCapture && element.hasPointerCapture(event.pointerId)) {
+      element.releasePointerCapture(event.pointerId);
+    }
+    activeGuide = null;
+  }
+
+  [guide1, guide2].forEach((guide, index) => {
+    guide.addEventListener('pointerdown', (event) => startGuideDrag(event, guide, index));
+    guide.addEventListener('pointermove', onGuideMove);
+    guide.addEventListener('pointerup', stopGuideDrag);
+    guide.addEventListener('pointercancel', stopGuideDrag);
+    guide.addEventListener('lostpointercapture', () => {
+      guide.classList.remove('is-dragging');
+      activeGuide = null;
+    });
+  });
+
+  clearBtn.addEventListener('click', () => {
+    clearPreview();
+    toast('تم حذف الصورة');
+  });
+
+  if (resetGuideBtn) {
+    resetGuideBtn.addEventListener('click', () => {
+      if (preview.classList.contains('hidden')) {
+        toast('أضف صورة أولاً');
+        return;
+      }
+      resetGuideLines();
+      toast('تمت إعادة ضبط الخطين');
+    });
+  }
+
+  hideGuideLines();
+}
+
+window.generateSupervisionReport = generateSupervisionReport;
+window.copySupervisionReport = copySupervisionReport;
+window.fillExample = fillExample;
+window.clearFields = clearFields;
+
+function initSupervisionPage() {
+  initSupervisionButtons();
+  initAuditImagePreview();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initSupervisionPage);
+} else {
+  initSupervisionPage();
+}
+
+</script>
 </body>
 </html>

@@ -495,7 +495,18 @@ function initAuditImagePreview() {
   hideGuideLines();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+window.generateSupervisionReport = generateSupervisionReport;
+window.copySupervisionReport = copySupervisionReport;
+window.fillExample = fillExample;
+window.clearFields = clearFields;
+
+function initSupervisionPage() {
   initSupervisionButtons();
   initAuditImagePreview();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initSupervisionPage);
+} else {
+  initSupervisionPage();
+}
