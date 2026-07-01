@@ -22,7 +22,6 @@ const fields = {
   callCenter: $('superCallCenter'),
   losPort: $('superLosPort'),
   paletoPort: $('superPaletoPort'),
-  searchRescue: $('searchRescue'),
   supervisionSubmitLink: $('supervisionSubmitLink'),
   operationsReportLink: $('operationsReportLink'),
   output: $('supervisionOutput')
@@ -44,8 +43,7 @@ const FALLBACKS = {
   deputyOperations: 'لا يوجد',
   callCenter: 'لا يوجد',
   losPort: 'لا يوجد',
-  paletoPort: 'لا يوجد',
-  searchRescue: 'لا يوجد'
+  paletoPort: 'لا يوجد'
 };
 
 const divider = 'ــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــ';
@@ -127,8 +125,7 @@ const supervisionMentionFields = [
   fields.deputyOperations,
   fields.callCenter,
   fields.losPort,
-  fields.paletoPort,
-  fields.searchRescue
+  fields.paletoPort
 ];
 
 function formatSupervisionMentions() {
@@ -180,7 +177,7 @@ ${divider}
 
 مشرفين متدربين: ${namedValue('traineeSupervision')}
 
-لاعب معتمد: ${namedValue('certifiedLadies')}
+لاعب معتمد والسيدات: ${namedValue('certifiedLadies')}
 ${divider}
 مسؤول افتتاح المتجر : ${namedValue('storeOpeningOfficer')}
 
@@ -200,11 +197,9 @@ ${divider}
 فني ميناء لوس: ${namedValue('losPort')}
 
 فني ميناء بوليتو: ${namedValue('paletoPort')}
-
-البحث والانقاذ: ${namedValue('searchRescue')}
 ${divider}
 
-[تسليم تقرير الاشراف](${supervisionLink}) 
+[تسليم تقرير الاشراف](${supervisionLink})
 [تقرير العمليات](${operationsLink})
 
 ${divider}
@@ -252,8 +247,7 @@ function fillExample() {
   fields.deputyOperations.value = '<@921536232805240873>';
   fields.callCenter.value = '<@734866411456823317>';
   fields.losPort.value = 'لا يوجد';
-  fields.paletoPort.value = '<@1328735995444723763>';
-  fields.searchRescue.value = 'لا يوجد';
+  fields.paletoPort.value = '<@1328735995444723763>';.value = 'لا يوجد';
   fields.supervisionSubmitLink.value = '';
   fields.operationsReportLink.value = '';
   generateSupervisionReport();

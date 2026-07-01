@@ -31,6 +31,11 @@ function value(input, fallback = 'لا يوجد') {
   return text.length ? text : fallback;
 }
 
+function unitValue(input) {
+  const text = String(input.value || '').trim();
+  return text.length ? text : 'لا يوجد';
+}
+
 function numberValue(input, fallback = '00') {
   const text = String(input.value || '').trim();
   if (!text.length) return fallback;
@@ -142,21 +147,21 @@ function buildReport() {
 السيدات و المعتمدين : ${value(fields.ladiesCertified)}
 
 
-جزيرة بوليتو : ${value(fields.islandPaleto)}
+جزيرة بوليتو : ${unitValue(fields.islandPaleto)}
 
 بوليتو :
-${value(fields.paleto)}
+${unitValue(fields.paleto)}
 
 ساندي :
 
-${value(fields.sandy)}
+${unitValue(fields.sandy)}
 
 
 
 
 لوس :
 
-${value(fields.los)}
+${unitValue(fields.los)}
 
 
 
