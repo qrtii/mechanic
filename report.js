@@ -109,7 +109,7 @@ function toast(message) {
 }
 
 function buildReport() {
-  const reportNumber = value(fields.reportNumber, '');
+  const reportNumber = value(fields.reportNumber, '0');
   const fromTime = toTwelveHourTime(value(fields.fromTime, '00:00'));
   const toTime = toTwelveHourTime(value(fields.toTime, '00:00'));
   const fromPeriod = value(fields.fromPeriod, 'ص');

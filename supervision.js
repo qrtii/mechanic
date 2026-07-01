@@ -29,23 +29,23 @@ const fields = {
 };
 
 const FALLBACKS = {
-  leadership: 'منشن للقيادة',
-  leaderAdvisor: 'منشن للمستشار',
-  generalSupervision: 'منشن للمشرف',
-  fieldSupervision: 'منشن للمشرف',
-  areaSupervision: 'منشن للمشرف',
-  traineeSupervision: 'منشن للمشرف',
-  certifiedLadies: 'منشن للمعتمد',
-  storeOpeningOfficer: 'منشن للمشرف',
-  garageRoomFieldSupervisor: 'منشن للمشرف',
-  garageRoomAreaSupervisor: 'منشن للمشرف',
-  garageRoomTraineeSupervisor: 'منشن للمشرف',
-  operations: 'منشن للفني',
-  deputyOperations: 'منشن للفني',
-  callCenter: 'منشن للفني',
-  losPort: 'منشن للفني',
-  paletoPort: 'منشن للفني',
-  searchRescue: 'منشن للفني'
+  leadership: 'لا يوجد',
+  leaderAdvisor: 'لا يوجد',
+  generalSupervision: 'لا يوجد',
+  fieldSupervision: 'لا يوجد',
+  areaSupervision: 'لا يوجد',
+  traineeSupervision: 'لا يوجد',
+  certifiedLadies: 'لا يوجد',
+  storeOpeningOfficer: 'لا يوجد',
+  garageRoomFieldSupervisor: 'لا يوجد',
+  garageRoomAreaSupervisor: 'لا يوجد',
+  garageRoomTraineeSupervisor: 'لا يوجد',
+  operations: 'لا يوجد',
+  deputyOperations: 'لا يوجد',
+  callCenter: 'لا يوجد',
+  losPort: 'لا يوجد',
+  paletoPort: 'لا يوجد',
+  searchRescue: 'لا يوجد'
 };
 
 const divider = 'ــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــ';
@@ -160,8 +160,8 @@ function buildSupervisionReport() {
   const fromPeriod = value(fields.fromPeriod, 'ص');
   const toTime = toTwelveHourTime(value(fields.toTime, '00:00'));
   const toPeriod = value(fields.toPeriod, 'ص');
-  const supervisionLink = value(fields.supervisionSubmitLink, '');
-  const operationsLink = value(fields.operationsReportLink, '');
+  const supervisionLink = value(fields.supervisionSubmitLink, 'لا يوجد');
+  const operationsLink = value(fields.operationsReportLink, 'لا يوجد');
 
   return `**تقرير رقم (${reportNumber})
 
