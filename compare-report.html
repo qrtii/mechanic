@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مقارنة التقرير | كراج الميكانيكي</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="page-shell wide">
+    <nav class="top-nav card" aria-label="التنقل بين صفحات الموقع">
+      <a href="index.html">توجيهات الميدان</a>
+      <a href="reports.html">التقارير الميدانية</a>
+      <a href="supervision.html">تقارير الاشراف</a>
+      <a href="admin.html">شؤون إدارية</a>
+      <a class="active" href="compare-report.html">مقارنة التقرير</a>
+    </nav>
+
+    <section class="hero card">
+      <div class="badge">كراج الميكانيكي</div>
+      <h1>مقارنة التقرير</h1>
+      <p>هذه الصفحة مخصصة لفتح أداة مقارنة التقرير داخل موقعنا.</p>
+    </section>
+
+    <section class="card compare-card">
+      <div class="button-row compare-actions">
+        <a class="open-external-link" href="https://xhhp1.github.io/SOMTINGHNEW/" target="_blank" rel="noopener">فتح مقارنة التقرير في صفحة مستقلة</a>
+      </div>
+
+      <div class="compare-frame-wrap">
+        <iframe
+          src="https://xhhp1.github.io/SOMTINGHNEW/"
+          title="مقارنة التقرير"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen>
+        </iframe>
+      </div>
+
+      <p class="section-note compare-note">
+        إذا لم تظهر الصفحة داخل الإطار، اضغط على زر فتح مقارنة التقرير في صفحة مستقلة.
+      </p>
+    </section>
+  </main>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
