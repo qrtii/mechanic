@@ -113,7 +113,70 @@ function toast(message) {
   toast.timer = setTimeout(() => box.classList.remove('show'), 1800);
 }
 
+
+function normalizeUnitCodesText(text) {
+  const normalized = normalizeDigits(String(text || '').trim());
+  if (!normalized) return '';
+
+  return normalized
+    .split(/\n+/)
+    .map((line) => {
+      const cleanLine = line.trim();
+      if (!cleanLine) return '';
+
+      return cleanLine
+        .split(/[\s,،]+/)
+        .map((part) => {
+          const clean = part.trim();
+          if (!clean) return '';
+
+          const withPrefix = clean.match(/^G\s*[-–—]?\s*(\d{1,4})$/i);
+          if (withPrefix) {
+            return `G-${withPrefix[1].padStart(3, '0')}`;
+          }
+
+          const digitsOnly = clean.match(/^\d{1,4}$/);
+          if (digitsOnly) {
+            return `G-${digitsOnly[0].padStart(3, '0')}`;
+          }
+
+          return clean;
+        })
+        .filter(Boolean)
+        .join('\n');
+    })
+    .filter(Boolean)
+    .join('\n');
+}
+
+function formatUnitCodeField(input) {
+  if (!input) return;
+  input.value = normalizeUnitCodesText(input.value);
+}
+
+function initAutoUnitCodePrefix() {
+  const unitFields = [
+    fields.islandPaleto,
+    fields.paleto,
+    fields.sandy,
+    fields.los
+  ];
+
+  unitFields.forEach((input) => {
+    if (!input) return;
+
+    input.addEventListener('blur', () => formatUnitCodeField(input));
+    input.addEventListener('change', () => formatUnitCodeField(input));
+
+    input.addEventListener('paste', () => {
+      setTimeout(() => formatUnitCodeField(input), 0);
+    });
+  });
+}
+
+
 function buildReport() {
+  [fields.islandPaleto, fields.paleto, fields.sandy, fields.los].forEach(formatUnitCodeField);
   const reportNumber = value(fields.reportNumber, '0');
   const fromTime = toTwelveHourTime(value(fields.fromTime, '00:00'));
   const toTime = toTwelveHourTime(value(fields.toTime, '00:00'));
@@ -836,3 +899,6 @@ const extractUnitsBtn = $('extractUnitsBtn');
 if (extractUnitsBtn) {
   extractUnitsBtn.addEventListener('click', extractUnitsFromAuditImage);
 }
+
+
+initAutoUnitCodePrefix();
