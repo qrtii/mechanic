@@ -236,6 +236,9 @@
     toggleElements('.leave-notes-group', merchant || reward || external);
     toggleElements('.reward-signature-title', !reward);
     toggleElements('.reward-signature-group', !reward);
+    [leaveFields.fromTime, leaveFields.fromPeriod, leaveFields.toTime, leaveFields.toPeriod].forEach(function (el) {
+      if (el) el.classList.toggle('hidden', external);
+    });
   }
 
   function updateVisibleForm() {
@@ -281,7 +284,7 @@
     var signature = safeText(leaveFields.signature, '');
 
     return '***` مكافأة قيادية  `*** \n\n' +
-      '***`الفني المحترم :` ' + data.person + '     ***            \n\n' +
+      '***`الفني / المشرف المحترم :` ' + data.person + '     ***            \n\n' +
       '***`المــــدة :` ' + data.duration + '***  \n\n' +
       '***من تاريخ ' + data.fromDate + ' ' + data.fromTime + ' ' + data.fromPeriod + '*** \n' +
       '***الى تاريخ ' + data.toDate + ' ' + data.toTime + ' ' + data.toPeriod + ' *** \n\n\n' +

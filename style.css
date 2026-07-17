@@ -672,3 +672,5 @@ textarea:focus {
   height: 100%;
   border: 0;
 }
+
+.external-hide-time.hidden { display: none !important; }
