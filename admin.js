@@ -189,6 +189,10 @@
     return currentType() === 'merchantLeave';
   }
 
+  function isExternalLeave() {
+    return currentType() === 'externalLeave';
+  }
+
   function isLeadershipReward() {
     return currentType() === 'leadershipReward';
   }
@@ -218,17 +222,18 @@
   function toggleLeaveUi() {
     var merchant = isMerchantLeave();
     var reward = isLeadershipReward();
+    var external = isExternalLeave();
 
     if (leaveFields.personLabel) {
-      leaveFields.personLabel.textContent = merchant ? 'التاجر المحترم' : 'الفني المحترم';
+      leaveFields.personLabel.textContent = (external || currentType() === 'internalLeave') ? 'الفني / المشرف المحترم' : (merchant ? 'التاجر المحترم' : 'الفني المحترم');
     }
     if (leaveFields.technician) {
       leaveFields.technician.placeholder = 'ضع Copy ID هنا وسيظهر كمنشن تلقائياً';
     }
 
-    toggleElements('.leave-balance-field', merchant || reward);
-    toggleElements('.leave-notes-title', merchant || reward);
-    toggleElements('.leave-notes-group', merchant || reward);
+    toggleElements('.leave-balance-field', merchant || reward || external);
+    toggleElements('.leave-notes-title', merchant || reward || external);
+    toggleElements('.leave-notes-group', merchant || reward || external);
     toggleElements('.reward-signature-title', !reward);
     toggleElements('.reward-signature-group', !reward);
   }
@@ -285,18 +290,32 @@
       '***`توقيع و اعتماد :` ' + signature + '***  \n\n';
   }
 
+  function buildExternalLeaveReport() {
+    var data = getLeaveCommonData();
+
+    return '***` إجازة خارجية `*** \n\n' +
+      '***`الفني / المشرف المحترم :`***   ' + data.person + '\n\n' +
+      '***`المــــدة :` ' + data.duration + '*** \n\n' +
+      '***من تاريخ ' + data.fromDate + ' *** \n' +
+      '***الى تاريخ ' + data.toDate + ' *** \n\n\n' +
+      '***يجب قراءة كامل [قوانين الإجازات](' + data.rulesLink + ') والافادة بالاستلام بوضع رياكشن ***\n\n' +
+      '`جهلك بالقوانين لا يعفيك من العقوبة\n`*** \n' +
+      '<@&1149742928953086105>  ***';
+  }
+
   function buildLeaveReport() {
     if (isMerchantLeave()) return buildMerchantLeaveReport();
     if (isLeadershipReward()) return buildLeadershipRewardReport();
+    if (isExternalLeave()) return buildExternalLeaveReport();
 
     ensureLeaveNotes();
-    var title = currentType() === 'externalLeave' ? 'إجازة خارجية' : 'إجازة داخلية';
+    var title = 'إجازة داخلية';
     var data = getLeaveCommonData();
     var remaining = calculateRemainingBalance() || safeText(leaveFields.calculatedRemaining, '00 ساعة');
     var notes = safeText(leaveFields.notes, DEFAULT_LEAVE_NOTES);
 
     return '***` ' + title + ' `*** \n\n' +
-      '***`الفني المحترم : ` ' + safeText(leaveFields.technician, '') + '     ***            \n\n' +
+      '***`الفني / المشرف المحترم : ` ' + safeText(leaveFields.technician, '') + '     ***            \n\n' +
       '***`المــــدة :` ' + data.duration + '*** \n' +
       '***`الرصيد المتبقي :` ' + remaining + '*** \n\n' +
       '***من تاريخ ' + data.fromDate + ' ' + data.fromTime + ' ' + data.fromPeriod + '*** \n' +
@@ -339,7 +358,7 @@
   function fillExample() {
     var type = currentType();
 
-    if (type === 'internalLeave' || type === 'externalLeave') {
+    if (type === 'internalLeave') {
       setValue(leaveFields.technician, '<@943708520648433674>');
       setValue(leaveFields.duration, '3 ساعة');
       setValue(leaveFields.remaining, '19 ساعة');
@@ -352,6 +371,21 @@
       setValue(leaveFields.toPeriod, 'ص');
       setValue(leaveFields.rulesLink, DEFAULT_LEAVE_RULES_LINK);
       setValue(leaveFields.notes, DEFAULT_LEAVE_NOTES);
+    }
+
+    if (type === 'externalLeave') {
+      setValue(leaveFields.technician, '<@1336726577265774715>');
+      setValue(leaveFields.duration, '30 يوم');
+      setValue(leaveFields.remaining, '');
+      setValue(leaveFields.calculatedRemaining, '');
+      setValue(leaveFields.fromDate, '2026-07-17');
+      setValue(leaveFields.fromTime, '');
+      setValue(leaveFields.fromPeriod, 'ص');
+      setValue(leaveFields.toDate, '2026-08-16');
+      setValue(leaveFields.toTime, '');
+      setValue(leaveFields.toPeriod, 'ص');
+      setValue(leaveFields.rulesLink, DEFAULT_LEAVE_RULES_LINK);
+      setValue(leaveFields.notes, '');
     }
 
     if (type === 'merchantLeave' || type === 'leadershipReward') {
