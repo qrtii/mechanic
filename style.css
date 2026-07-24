@@ -1241,3 +1241,164 @@ textarea,
     scroll-behavior: auto !important;
   }
 }
+
+
+.discord-profile-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid rgba(217,154,43,0.35);
+  border-radius: 12px;
+  background: rgba(217,154,43,0.08);
+}
+
+.discord-profile-card img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(217,154,43,0.75);
+  background: rgba(255,255,255,0.08);
+}
+
+.discord-profile-card strong {
+  display: block;
+  color: #fff;
+  font-weight: 900;
+  line-height: 1.5;
+}
+
+.discord-profile-card span {
+  display: block;
+  direction: ltr;
+  text-align: right;
+  color: rgba(255,255,255,0.65);
+  font-size: 0.88rem;
+}
+
+
+/* توجيهات الميدان: الحساب حسب تسجيل الدخول فقط */
+.direction-only-card {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.account-field,
+.direction-field {
+  align-self: end;
+}
+
+.discord-profile-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 76px;
+  padding: 12px;
+  border: 1px solid rgba(217,154,43,0.38);
+  border-radius: 12px;
+  background: rgba(217,154,43,0.08);
+}
+
+.discord-profile-card img {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(217,154,43,0.78);
+  background: rgba(255,255,255,0.08);
+}
+
+.discord-profile-card strong {
+  display: block;
+  color: #fff;
+  font-weight: 900;
+  line-height: 1.5;
+}
+
+.discord-profile-card span {
+  display: block;
+  direction: ltr;
+  text-align: right;
+  color: rgba(255,255,255,0.67);
+  font-size: 0.88rem;
+}
+
+@media (max-width: 760px) {
+  .direction-only-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* FINAL: توجيهات الميدان مرتبطة بالحساب فقط */
+.direction-account-only-card {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  align-items: end;
+}
+
+.account-profile-field,
+.direction-select-field {
+  min-width: 0;
+}
+
+.discord-profile-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 78px;
+  padding: 13px;
+  border: 1px solid rgba(217,154,43,0.42);
+  border-radius: 13px;
+  background: rgba(217,154,43,0.08);
+}
+
+.discord-profile-card img {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(217,154,43,0.78);
+  background: rgba(255,255,255,0.08);
+}
+
+.discord-profile-card strong {
+  display: block;
+  color: #fff;
+  font-weight: 900;
+  line-height: 1.5;
+}
+
+.discord-profile-card span {
+  display: block;
+  direction: ltr;
+  text-align: right;
+  color: rgba(255,255,255,0.67);
+  font-size: 0.88rem;
+}
+
+.account-output-hint {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 12px 14px;
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 11px;
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.72);
+}
+
+.account-output-hint strong {
+  color: #f3c266;
+}
+
+.account-actions-row {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 760px) {
+  .direction-account-only-card {
+    grid-template-columns: 1fr !important;
+  }
+}

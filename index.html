@@ -3,97 +3,82 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>توجيهات الميدان | كراج الميكانيك</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>توجيهات الميدان | كراج الميكانيكي</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=rp-light" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=supervision-direction-options" />
 </head>
 <body>
-  <main class="page-shell">
-    <nav class="top-nav card" aria-label="التنقل بين صفحات الموقع">
-      <a class="active" href="index.html">توجيهات الميدان</a>
-      <a href="reports.html">التقارير الميدانية</a>
-      <a href="supervision.html">تقارير الاشراف</a>
-      <a href="admin.html">شؤون إدارية</a>
-      <a href="compare-report.html">مقارنة التقرير</a>
-    
-      <div class="nav-session-box">
-        <span>Discord ID</span>
-        <strong data-discord-id>---</strong>
-        <button type="button" data-logout>إنهاء الجلسة</button>
-      </div>
-    </nav>
+  <nav class="top-nav">
+    <a class="active" href="index.html">توجيهات الميدان</a>
+    <a href="reports.html">التقارير الميدانية</a>
+    <a href="supervision.html">تقارير الإشراف</a>
+    <a href="admin.html">شؤون إدارية</a>
+    <a href="compare-report.html">مقارنة التقرير</a>
+    <div class="nav-session-box">
+      <span>Discord ID</span>
+      <strong data-discord-id>---</strong>
+      <button type="button" data-logout>إنهاء الجلسة</button>
+    </div>
+  </nav>
 
+  <main class="page-shell wide">
     <section class="hero card">
-      <div class="badge">كراج الميكانيك</div>
+      <span class="badge">كراج الميكانيكي</span>
       <h1>توجيهات الميدان</h1>
-      <p>اختر الموقع والاسم والكود، ثم اضغط إظهار الاسم للحصول على النص جاهزاً للنسخ.</p>
+      <p>حسابك يحدد الاسم والكود تلقائياً. اختر التوجيه فقط، ثم انسخ النص الجاهز.</p>
     </section>
 
-    <section class="card form-card" aria-label="نموذج المسمى الميداني">
-      <div class="field">
-        <label for="rank">الموقع / المسمى الميداني</label>
-        <select id="rank" required>
-          <option value="">اختر المسمى</option>
-          <option>اشراف عام</option>
-          <option>اشراف ميداني</option>
-          <option>اشراف منطقة لوس</option>
-          <option>اشراف منطقة ساندي</option>
-          <option>اشراف منطقة بوليتو</option>
-          <option>اشراف منطقة ساندي + بوليتو</option>
-          <option>لوس</option>
-          <option>ساندي</option>
-          <option>بوليتو</option>
-          <option>الجزيرة</option>
-          <option>العمليات</option>
-          <option>نائب العمليات</option>
-          <option>مركز الاتصالات</option>
-        </select>
+    <section class="form-card card direction-account-only-card">
+      <div class="field account-profile-field">
+        <label>الحساب الخاص بك</label>
+        <div id="currentProfileCard" class="discord-profile-card account-ready">
+          <img id="currentProfileAvatar" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="صورة الحساب" />
+          <div>
+            <strong id="currentProfileName">جاري تحميل الحساب...</strong>
+            <span id="currentProfileDetails">---</span>
+          </div>
+        </div>
       </div>
 
-      <div class="field">
-        <label for="company">الاسم</label>
-        <select id="company">
-          <option value="">اختر الاسم</option>
-          <option>سعيد البدواوي</option>
-          <option>محمد بن فاضل</option>
-          </select>
+      <div class="field direction-select-field">
+        <label for="rank">التوجيه / المسمى الميداني</label>
+        <select id="rank">
+          <option value="">اختر التوجيه</option>
+          <option value="جزيرة بوليتو">جزيرة بوليتو</option>
+          <option value="بوليتو">بوليتو</option>
+          <option value="ساندي">ساندي</option>
+          <option value="لوس">لوس</option>
+          <option value="ميناء لوس">ميناء لوس</option>
+          <option value="ميناء بوليتو">ميناء بوليتو</option>
+        
+          <option value="اشراف منطقة لوس">اشراف منطقة لوس</option>
+          <option value="اشراف منطقة ساندي">اشراف منطقة ساندي</option>
+          <option value="اشراف منطقة بوليتو">اشراف منطقة بوليتو</option>
+          <option value="اشراف منطقة ساندي + بوليتو">اشراف منطقة ساندي + بوليتو</option></select>
       </div>
 
-      <div class="field">
-        <label for="certified">لاعب معتمد <span>(اختياري)</span></label>
-        <select id="certified">
-          <option value="">بدون</option>
-          <option>CD</option>
-          <option>CC</option>
-          <option>CB</option>
-          <option>CA</option>
-        </select>
+      <div class="account-output-hint">
+        <strong>صيغة النص:</strong>
+        <span>الاسم | CD | الكود | التوجيه</span>
       </div>
 
-      <div class="field">
-        <label for="playerName">الكود <span>(اختياري)</span></label>
-        <select id="playerName">
-          <option value="">بدون كود</option>
-          <option>G-142</option>
-          <option>G-070</option>
-        </select>
+      <div class="button-row account-actions-row">
+        <button id="showBtn" class="primary" type="button">إظهار النص</button>
+        <button id="copyBtn" class="secondary" type="button">نسخ النص</button>
       </div>
 
-      <div class="button-row">
-        <button id="showBtn" class="primary" type="button">اضغط هنا لإظهار اسمك ✒️</button>
-        <button id="copyBtn" class="secondary" type="button">اضغط هنا للنسخ</button>
-      </div>
-
-      <div id="resultBox" class="result" aria-live="polite">
-        سيظهر النص هنا بعد الاختيار.
-      </div>
+      <div id="resultBox" class="result">سيظهر النص هنا بعد اختيار التوجيه.</div>
     </section>
   </main>
 
-  <div id="toast" role="status" aria-live="polite"></div>
-  <script src="script.js"></script>
-  <script src="auth.js?v=rp-light"></script>
+  <div id="toast"></div>
+
+  <script src="auth.js?v=supervision-direction-options"></script>
+  <script src="script.js?v=supervision-direction-options"></script>
 </body>
 </html>
