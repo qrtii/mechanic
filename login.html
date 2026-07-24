@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تسجيل الدخول | كراج الميكانيكي</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=rp-ops-final" />
+</head>
+<body class="login-body">
+  <main class="login-shell" aria-label="تسجيل الدخول">
+    <section class="login-card">
+      <div class="login-panel login-form-panel">
+        <div class="brand-row">
+          <div class="brand-mark">⚙</div>
+          <div>
+            <span>تسجيل العمليات</span>
+            <strong>كراج الميكانيكي</strong>
+          </div>
+        </div>
+
+        <div class="login-chip">🔒 بوابة مركز العمليات</div>
+        <h1>دخول مركز العمليات</h1>
+        <p>أدخل معرّف ديسكورد الخاص بك للمتابعة إلى مساحة العمل المحمية.</p>
+
+        <form id="loginForm" class="login-form">
+          <label for="discordIdInput">معرّف ديسكورد</label>
+          <div class="login-input-wrap">
+            <input id="discordIdInput" type="text" inputmode="numeric" autocomplete="off" placeholder="اكتب معرف ديسكورد" />
+            <span>🆔</span>
+          </div>
+          <div id="loginError" class="login-error hidden"></div>
+          <small>الدخول مسموح فقط للمعرفات المصرح لها، ويتم حفظ الجلسة لمدة 12 ساعة على هذا الجهاز.</small>
+          <button class="primary login-submit" type="submit">دخول مركز العمليات ⚡</button>
+        </form>
+
+        <div class="login-safe-note">🛡️ صلاحية الجلسة محفوظة لمدة 12 ساعة على هذا الجهاز.</div>
+      </div>
+
+      <aside class="login-panel login-side-panel">
+        <div class="side-logo">⚙</div>
+        <div class="side-number">01 / بوابة</div>
+        <div class="side-line"></div>
+        <p>سجل منظم للوصول إلى تفاصيل الميدان، التقارير، والمتابعة التشغيلية.</p>
+        <div class="mini-badge">دخول مقيّد</div>
+      </aside>
+    </section>
+  </main>
+
+  <script src="auth.js?v=rp-ops-final"></script>
+</body>
+</html>

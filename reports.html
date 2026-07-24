@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=rp-ops-final" />
 </head>
 <body>
   <main class="page-shell wide">
@@ -17,6 +17,12 @@
       <a href="supervision.html">تقارير الاشراف</a>
       <a href="admin.html">شؤون إدارية</a>
       <a href="compare-report.html">مقارنة التقرير</a>
+    
+      <div class="nav-session-box">
+        <span>Discord ID</span>
+        <strong data-discord-id>---</strong>
+        <button type="button" data-logout>إنهاء الجلسة</button>
+      </div>
     </nav>
 
     <section class="hero card">
@@ -225,5 +231,6 @@
 
   <div id="toast" role="status" aria-live="polite"></div>
   <script src="report.js"></script>
+  <script src="auth.js?v=rp-ops-final"></script>
 </body>
 </html>
