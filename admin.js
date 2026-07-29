@@ -367,10 +367,10 @@
       setValue(leaveFields.remaining, '19 ساعة');
       calculateRemainingBalance();
       setValue(leaveFields.fromDate, '2026-06-29');
-      setValue(leaveFields.fromTime, '04:10');
+      setValue(leaveFields.fromTime, '04:00');
       setValue(leaveFields.fromPeriod, 'ص');
       setValue(leaveFields.toDate, '2026-06-29');
-      setValue(leaveFields.toTime, '07:10');
+      setValue(leaveFields.toTime, '07:00');
       setValue(leaveFields.toPeriod, 'ص');
       setValue(leaveFields.rulesLink, DEFAULT_LEAVE_RULES_LINK);
       setValue(leaveFields.notes, DEFAULT_LEAVE_NOTES);
@@ -397,10 +397,10 @@
       setValue(leaveFields.remaining, '');
       setValue(leaveFields.calculatedRemaining, '');
       setValue(leaveFields.fromDate, '2026-06-29');
-      setValue(leaveFields.fromTime, '00:00');
+      setValue(leaveFields.fromTime, '12:00');
       setValue(leaveFields.fromPeriod, 'ص');
       setValue(leaveFields.toDate, '2026-06-29');
-      setValue(leaveFields.toTime, '00:00');
+      setValue(leaveFields.toTime, '12:00');
       setValue(leaveFields.toPeriod, 'م');
       setValue(leaveFields.rulesLink, DEFAULT_LEAVE_RULES_LINK);
       if (type === 'leadershipReward') setValue(leaveFields.signature, '<@943708520648433674>');

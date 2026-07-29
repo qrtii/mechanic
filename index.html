@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=supervision-direction-options" />
+  <link rel="stylesheet" href="style.css?v=time-dropdown-select" />
 </head>
 <body>
   <nav class="top-nav">
@@ -49,15 +49,21 @@
         <label for="rank">التوجيه / المسمى الميداني</label>
         <select id="rank">
           <option value="">اختر التوجيه</option>
-          <option value="الجزيرة">الجزيرة</option>
+          <option value="جزيرة بوليتو">جزيرة بوليتو</option>
           <option value="بوليتو">بوليتو</option>
           <option value="ساندي">ساندي</option>
           <option value="لوس">لوس</option>
-          <option value="شؤون التوظيف">شؤون التوظيف</option>
+          <option value="ميناء لوس">ميناء لوس</option>
+          <option value="ميناء بوليتو">ميناء بوليتو</option>
+        
           <option value="اشراف منطقة لوس">اشراف منطقة لوس</option>
           <option value="اشراف منطقة ساندي">اشراف منطقة ساندي</option>
           <option value="اشراف منطقة بوليتو">اشراف منطقة بوليتو</option>
           <option value="اشراف منطقة ساندي + بوليتو">اشراف منطقة ساندي + بوليتو</option></select>
+        <div id="rankCustomSelect" class="custom-select" data-select-target="rank">
+          <button id="rankCustomButton" class="custom-select-button" type="button" aria-haspopup="listbox" aria-expanded="false">اختر التوجيه</button>
+          <div id="rankCustomMenu" class="custom-select-menu" role="listbox" aria-label="التوجيه / المسمى الميداني"></div>
+        </div>
       </div>
 
       <div class="account-output-hint">
@@ -76,7 +82,7 @@
 
   <div id="toast"></div>
 
-  <script src="auth.js?v=supervision-direction-options"></script>
-  <script src="script.js?v=supervision-direction-options"></script>
+  <script src="auth.js?v=time-dropdown-select"></script>
+  <script src="script.js?v=firefox-custom-select"></script>
 </body>
 </html>
