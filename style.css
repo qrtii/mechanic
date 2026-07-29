@@ -1679,3 +1679,6 @@ select option:checked {
 .admin-date-time-row {
   overflow: visible !important;
 }
+
+/* حذف خانة الملاحظات نهائياً من الشؤون الإدارية */
+.leave-notes-title, .leave-notes-group, #leaveNotes { display: none !important; }

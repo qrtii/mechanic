@@ -31,7 +31,6 @@
     toMinute: $('leaveToMinute'),
     toPeriod: $('leaveToPeriod'),
     rulesLink: $('leaveRulesLink'),
-    notes: $('leaveNotes'),
     signature: $('rewardSignature')
   };
 
@@ -278,11 +277,7 @@
     }
   }
 
-  function ensureLeaveNotes() {
-    if (leaveFields.notes && !String(leaveFields.notes.value || '').trim()) {
-      leaveFields.notes.value = DEFAULT_LEAVE_NOTES;
-    }
-  }
+  function ensureLeaveNotes() {}
 
   function toggleElements(selector, hidden) {
     Array.prototype.forEach.call(document.querySelectorAll(selector), function (el) {
@@ -303,8 +298,6 @@
     }
 
     toggleElements('.leave-balance-field', merchant || reward || external);
-    toggleElements('.leave-notes-title', merchant || reward || external);
-    toggleElements('.leave-notes-group', merchant || reward || external);
     toggleElements('.reward-signature-title', !reward);
     toggleElements('.reward-signature-group', !reward);
     [leaveFields.fromTime, leaveFields.fromMinute, leaveFields.fromPeriod, leaveFields.toTime, leaveFields.toMinute, leaveFields.toPeriod].forEach(function (el) {
@@ -402,11 +395,9 @@
     if (isLeadershipReward()) return buildLeadershipRewardReport();
     if (isExternalLeave()) return buildExternalLeaveReport();
 
-    ensureLeaveNotes();
     var title = 'إجازة داخلية';
     var data = getLeaveCommonData();
     var remaining = calculateRemainingBalance() || safeText(leaveFields.calculatedRemaining, '00 ساعة');
-    var notes = safeText(leaveFields.notes, DEFAULT_LEAVE_NOTES);
 
     return '***` ' + title + ' `*** \n\n' +
       '***`الفني / المشرف المحترم : ` ' + safeText(leaveFields.technician, '') + '     ***            \n\n' +
@@ -414,7 +405,6 @@
       '***`الرصيد المتبقي :` ' + remaining + '*** \n\n' +
       '***من تاريخ ' + data.fromDate + ' ' + data.fromTime + ' ' + data.fromPeriod + '*** \n' +
       '***الى تاريخ ' + data.toDate + ' ' + data.toTime + ' ' + data.toPeriod + ' *** \n\n' +
-      '***`الملاحظات :` ' + notes + '***\n\n' +
       '***يجب قراءة كامل [قوانين الإجازات](' + data.rulesLink + ') والافادة بالاستلام بوضع رياكشن ***\n\n' +
       '`جهلك بالقوانين لا يعفيك من العقوبة\n`*** \n';
   }
@@ -466,7 +456,6 @@
       setValue(leaveFields.toMinute, '10');
       setValue(leaveFields.toPeriod, 'ص');
       setValue(leaveFields.rulesLink, DEFAULT_LEAVE_RULES_LINK);
-      setValue(leaveFields.notes, DEFAULT_LEAVE_NOTES);
     }
 
     if (type === 'externalLeave') {
@@ -483,7 +472,6 @@
       setValue(leaveFields.toMinute, '');
       setValue(leaveFields.toPeriod, 'ص');
       setValue(leaveFields.rulesLink, DEFAULT_LEAVE_RULES_LINK);
-      setValue(leaveFields.notes, '');
     }
 
     if (type === 'merchantLeave' || type === 'leadershipReward') {
@@ -523,8 +511,7 @@
     });
     if (section === 'leave') {
       ensureLeaveRulesLink();
-      ensureLeaveNotes();
-      }
+        }
     if (output) output.value = DEFAULT_OUTPUT_TEXT;
     toast('تم مسح الخانات');
   }
