@@ -1550,3 +1550,50 @@ select option:checked {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* إصلاح ظهور خانة الدقائق في الشؤون الإدارية */
+.admin-date-time-row {
+  display: grid !important;
+  grid-template-columns: minmax(190px, 1fr) 120px 120px 80px !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+.admin-date-time-row input,
+.admin-date-time-row select {
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+#leaveFromTime,
+#leaveToTime,
+#leaveFromMinute,
+#leaveToMinute,
+#leaveFromPeriod,
+#leaveToPeriod {
+  color: #f8fbff !important;
+  background-color: #0b1724 !important;
+}
+
+#leaveFromTime option,
+#leaveToTime option,
+#leaveFromMinute option,
+#leaveToMinute option,
+#leaveFromPeriod option,
+#leaveToPeriod option {
+  color: #f8fbff !important;
+  background: #101820 !important;
+}
+
+@media (max-width: 1100px) {
+  .admin-date-time-row {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+@media (max-width: 620px) {
+  .admin-date-time-row {
+    grid-template-columns: 1fr !important;
+  }
+}
