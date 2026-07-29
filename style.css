@@ -1523,17 +1523,30 @@ select option:checked {
 }
 
 
-/* حقول الوقت كقائمة اختيار بدل الكتابة اليدوية */
-select[id$="Time"],
+/* تنظيف خيارات التوجيه + دقائق الإجازة */
+.inline.date-time {
+  grid-template-columns: minmax(0, 1fr) 86px 86px 76px;
+}
+
 #leaveFromTime,
-#leaveToTime {
+#leaveToTime,
+#leaveFromMinute,
+#leaveToMinute {
   color: #f8fbff !important;
   background-color: #0b1724 !important;
 }
 
-select[id$="Time"] option,
 #leaveFromTime option,
-#leaveToTime option {
+#leaveToTime option,
+#leaveFromMinute option,
+#leaveToMinute option,
+#rank option {
   color: #f8fbff !important;
   background: #101820 !important;
+}
+
+@media (max-width: 760px) {
+  .inline.date-time {
+    grid-template-columns: 1fr;
+  }
 }

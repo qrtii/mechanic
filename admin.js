@@ -24,9 +24,11 @@
     calculatedRemaining: $('leaveCalculatedRemaining'),
     fromDate: $('leaveFromDate'),
     fromTime: $('leaveFromTime'),
+    fromMinute: $('leaveFromMinute'),
     fromPeriod: $('leaveFromPeriod'),
     toDate: $('leaveToDate'),
     toTime: $('leaveToTime'),
+    toMinute: $('leaveToMinute'),
     toPeriod: $('leaveToPeriod'),
     rulesLink: $('leaveRulesLink'),
     notes: $('leaveNotes'),
@@ -236,7 +238,7 @@
     toggleElements('.leave-notes-group', merchant || reward || external);
     toggleElements('.reward-signature-title', !reward);
     toggleElements('.reward-signature-group', !reward);
-    [leaveFields.fromTime, leaveFields.fromPeriod, leaveFields.toTime, leaveFields.toPeriod].forEach(function (el) {
+    [leaveFields.fromTime, leaveFields.fromMinute, leaveFields.fromPeriod, leaveFields.toTime, leaveFields.toMinute, leaveFields.toPeriod].forEach(function (el) {
       if (el) el.classList.toggle('hidden', external);
     });
   }
@@ -250,6 +252,24 @@
     if (output) output.value = DEFAULT_OUTPUT_TEXT;
   }
 
+
+  function formatTimeParts(hourInput, minuteInput, fallback) {
+    if (fallback === undefined) fallback = '00:00';
+    var hour = hourInput && hourInput.value !== undefined ? String(hourInput.value).trim() : '';
+    var minute = minuteInput && minuteInput.value !== undefined ? String(minuteInput.value).trim() : '';
+
+    if (!hour) return fallback;
+
+    if (hour.indexOf(':') !== -1) {
+      var parts = hour.split(':');
+      hour = parts[0] || '';
+      if (!minute) minute = parts[1] || '';
+    }
+
+    if (!minute) minute = '00';
+    return toTwelveHourTime(hour + ':' + minute);
+  }
+
   function getLeaveCommonData() {
     ensureLeaveRulesLink();
     formatMentionField(leaveFields.technician);
@@ -259,10 +279,10 @@
       person: safeText(leaveFields.technician, ''),
       duration: safeText(leaveFields.duration, '00 ساعة'),
       fromDate: formatDate(leaveFields.fromDate),
-      fromTime: formatTime(leaveFields.fromTime),
+      fromTime: formatTimeParts(leaveFields.fromTime, leaveFields.fromMinute),
       fromPeriod: safeText(leaveFields.fromPeriod, 'ص'),
       toDate: formatDate(leaveFields.toDate),
-      toTime: formatTime(leaveFields.toTime),
+      toTime: formatTimeParts(leaveFields.toTime, leaveFields.toMinute),
       toPeriod: safeText(leaveFields.toPeriod, 'ص'),
       rulesLink: safeText(leaveFields.rulesLink, DEFAULT_LEAVE_RULES_LINK)
     };
@@ -367,10 +387,10 @@
       setValue(leaveFields.remaining, '19 ساعة');
       calculateRemainingBalance();
       setValue(leaveFields.fromDate, '2026-06-29');
-      setValue(leaveFields.fromTime, '04:00');
+      setValue(leaveFields.fromTime, '04:10');
       setValue(leaveFields.fromPeriod, 'ص');
       setValue(leaveFields.toDate, '2026-06-29');
-      setValue(leaveFields.toTime, '07:00');
+      setValue(leaveFields.toTime, '07:10');
       setValue(leaveFields.toPeriod, 'ص');
       setValue(leaveFields.rulesLink, DEFAULT_LEAVE_RULES_LINK);
       setValue(leaveFields.notes, DEFAULT_LEAVE_NOTES);
@@ -383,9 +403,11 @@
       setValue(leaveFields.calculatedRemaining, '');
       setValue(leaveFields.fromDate, '2026-07-17');
       setValue(leaveFields.fromTime, '');
+      setValue(leaveFields.fromMinute, '');
       setValue(leaveFields.fromPeriod, 'ص');
       setValue(leaveFields.toDate, '2026-08-16');
       setValue(leaveFields.toTime, '');
+      setValue(leaveFields.toMinute, '');
       setValue(leaveFields.toPeriod, 'ص');
       setValue(leaveFields.rulesLink, DEFAULT_LEAVE_RULES_LINK);
       setValue(leaveFields.notes, '');
@@ -397,10 +419,10 @@
       setValue(leaveFields.remaining, '');
       setValue(leaveFields.calculatedRemaining, '');
       setValue(leaveFields.fromDate, '2026-06-29');
-      setValue(leaveFields.fromTime, '12:00');
+      setValue(leaveFields.fromTime, '00:00');
       setValue(leaveFields.fromPeriod, 'ص');
       setValue(leaveFields.toDate, '2026-06-29');
-      setValue(leaveFields.toTime, '12:00');
+      setValue(leaveFields.toTime, '00:00');
       setValue(leaveFields.toPeriod, 'م');
       setValue(leaveFields.rulesLink, DEFAULT_LEAVE_RULES_LINK);
       if (type === 'leadershipReward') setValue(leaveFields.signature, '<@943708520648433674>');
