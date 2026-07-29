@@ -42,6 +42,72 @@
     duration: $('assignmentDuration')
   };
 
+
+  function syncCustomTimeControl(input) {
+    if (!input || !input.id) return;
+
+    var wrapper = document.querySelector('.custom-time-select[data-target="' + input.id + '"]');
+    if (!wrapper) return;
+
+    var trigger = wrapper.querySelector('.custom-time-trigger');
+    if (!trigger) return;
+
+    var fallback = input.id.indexOf('Minute') !== -1 ? 'الدقيقة' : 'اختر الساعة';
+    trigger.textContent = input.value ? input.value : fallback;
+
+    Array.prototype.forEach.call(wrapper.querySelectorAll('.custom-time-option'), function (option) {
+      option.classList.toggle('selected', option.dataset.value === input.value);
+    });
+  }
+
+  function closeCustomTimeMenus(exceptWrapper) {
+    Array.prototype.forEach.call(document.querySelectorAll('.custom-time-select.open'), function (wrapper) {
+      if (wrapper !== exceptWrapper) {
+        wrapper.classList.remove('open');
+        var trigger = wrapper.querySelector('.custom-time-trigger');
+        if (trigger) trigger.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  function initCustomTimeDropdowns() {
+    Array.prototype.forEach.call(document.querySelectorAll('.custom-time-select'), function (wrapper) {
+      var target = $(wrapper.dataset.target);
+      var trigger = wrapper.querySelector('.custom-time-trigger');
+
+      if (!target || !trigger || wrapper.dataset.ready === '1') return;
+      wrapper.dataset.ready = '1';
+
+      trigger.addEventListener('click', function () {
+        var willOpen = !wrapper.classList.contains('open');
+        closeCustomTimeMenus(wrapper);
+        wrapper.classList.toggle('open', willOpen);
+        trigger.setAttribute('aria-expanded', String(willOpen));
+      });
+
+      Array.prototype.forEach.call(wrapper.querySelectorAll('.custom-time-option'), function (option) {
+        option.addEventListener('click', function () {
+          target.value = option.dataset.value || '';
+          target.dispatchEvent(new Event('change', { bubbles: true }));
+          syncCustomTimeControl(target);
+          closeCustomTimeMenus();
+        });
+      });
+
+      syncCustomTimeControl(target);
+    });
+
+    document.addEventListener('click', function (event) {
+      if (!event.target.closest('.custom-time-select')) {
+        closeCustomTimeMenus();
+      }
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') closeCustomTimeMenus();
+    });
+  }
+
   function safeText(input, fallback) {
     if (fallback === undefined) fallback = 'لا يوجد';
     var text = input && input.value !== undefined ? String(input.value).trim() : '';
@@ -49,7 +115,10 @@
   }
 
   function setValue(input, val) {
-    if (input) input.value = val;
+    if (input) {
+      input.value = val;
+      syncCustomTimeControl(input);
+    }
   }
 
   function normalizeArabicNumbers(text) {
@@ -241,6 +310,7 @@
     [leaveFields.fromTime, leaveFields.fromMinute, leaveFields.fromPeriod, leaveFields.toTime, leaveFields.toMinute, leaveFields.toPeriod].forEach(function (el) {
       if (el) el.classList.toggle('hidden', external);
     });
+    toggleElements('.external-hide-time-custom', external);
   }
 
   function updateVisibleForm() {
@@ -506,6 +576,7 @@
 
   ensureLeaveRulesLink();
   ensureLeaveNotes();
+  initCustomTimeDropdowns();
   bindEvents();
   updateVisibleForm();
 }());
