@@ -4,7 +4,7 @@
 const FIELD_ACCOUNT_PROFILES = {
   "481603641158139924": {
     name: "سعيد البدواوي",
-    code: "G-142",
+    code: "G-109",
     certified: "CD",
     avatar: "https://cdn.discordapp.com/embed/avatars/0.png"
   },
