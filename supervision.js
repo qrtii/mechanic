@@ -35,6 +35,10 @@ function toTwelveHourTime(rawTime, fallback = '00:00') {
 }
 
 function convertDiscordIdsToMentions(text) {
+  if (window.MechanicsMentions && typeof window.MechanicsMentions.resolve === 'function') {
+    return window.MechanicsMentions.resolve(text);
+  }
+
   const placeholders = [];
   let working = normalizeDigits(String(text || ''));
 
@@ -53,9 +57,89 @@ function convertDiscordIdsToMentions(text) {
   return working.trim();
 }
 
+
+
+
+// تحويل أكواد الإشراف إلى منشن مباشرة بدون انتظار تحميل الجدول
+const SUPERVISION_CODE_MENTION_MAP = {
+  "G-001": "818887908265033728",
+  "G-002": "680393068469682256",
+  "G-003": "451806885419679765",
+  "G-004": "1199529688989696051",
+  "G-005": "1282062186579230792",
+  "G-006": "943672877272694824",
+  "G-007": "1329539822028849152",
+  "G-008": "1129397195116920863",
+  "G-009": "457775919122087936",
+  "G-010": "1347310064977055834",
+  "G-011": "1131176314498449510",
+  "G-012": "1139633117875933325",
+  "G-014": "1134737782712053880",
+  "G-015": "757230139569471559",
+  "G-016": "557660657990893588",
+  "G-017": "831347644110077975",
+  "G-018": "947130192277667880",
+  "G-019": "320389666161295360",
+  "G-024": "1345208492264521738",
+  "G-025": "612462415463972864",
+  "G-026": "719523763904839760",
+  "G-027": "755393813035483136",
+  "G-028": "725628601348784129",
+  "G-047": "1014559920479272980",
+  "G-048": "1278765100538265632",
+  "G-049": "1394494154347642942",
+  "G-050": "927282301426073610",
+  "G-051": "612809010424446976",
+  "G-052": "1459966470694899898",
+  "G-053": "725308791339614248",
+  "G-070": "1336726577265774715",
+  "G-109": "481603641158139924"
+};
+
+function normalizeSupervisionCodeToken(token) {
+  const normalized = normalizeDigits(String(token || '')).toUpperCase().trim();
+  const match = normalized.match(/G\s*[-–—]?\s*(\d{1,4})/) || normalized.match(/^(\d{1,4})$/);
+  if (!match) return '';
+  return 'G-' + match[1].padStart(3, '0');
+}
+
+function resolveSupervisionCodesDirect(text) {
+  let working = normalizeDigits(String(text || ''));
+
+  const protectedMentions = [];
+  working = working.replace(/<@&?\d{15,25}>|<@!?\d{15,25}>/g, (mention) => {
+    const token = '__SUPERVISION_MENTION_' + protectedMentions.length + '__';
+    protectedMentions.push(mention);
+    return token;
+  });
+
+  // Copy ID مباشر
+  working = working.replace(/\b\d{15,25}\b/g, (id) => '<@' + id + '>');
+
+  // كود مثل G-001 أو g-001 أو 001
+  working = working.replace(/(?:^|[^\dA-Za-z])(?:G\s*[-–—]?\s*)?\d{1,4}(?=$|[^\dA-Za-z])/gi, (match) => {
+    const prefix = match.match(/^\s|^[^\dA-Za-z]/) ? match.charAt(0) : '';
+    const token = prefix ? match.slice(1) : match;
+    const code = normalizeSupervisionCodeToken(token);
+    if (!code || !SUPERVISION_CODE_MENTION_MAP[code]) return match;
+    return prefix + '<@' + SUPERVISION_CODE_MENTION_MAP[code] + '>';
+  });
+
+  // محاولة من جدول الميكانيك أيضاً، لو كان متاحاً
+  if (window.MechanicsMentions && typeof window.MechanicsMentions.resolve === 'function') {
+    working = window.MechanicsMentions.resolve(working);
+  }
+
+  protectedMentions.forEach((mention, index) => {
+    working = working.replace('__SUPERVISION_MENTION_' + index + '__', mention);
+  });
+
+  return working.trim();
+}
+
 function formatMentionField(input) {
   if (!input) return;
-  input.value = convertDiscordIdsToMentions(input.value);
+  input.value = resolveSupervisionCodesDirect(input.value);
 }
 
 function inBrackets(text) {
@@ -122,7 +206,7 @@ const mentionFields = [
 const divider = 'ــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــ';
 
 function named(input) {
-  return inBrackets(value(input, 'لا يوجد'));
+  return inBrackets(resolveSupervisionCodesDirect(value(input, 'لا يوجد')));
 }
 
 function buildSupervisionReport() {
@@ -241,6 +325,46 @@ function clearFields() {
   fields.toPeriod.value = 'ص';
   fields.output.value = 'سيظهر تقرير الإشراف هنا بعد الضغط على إنشاء التقرير.';
   toast('تم مسح خانات تقرير الإشراف');
+}
+
+
+function initMechanicMentionAutoResolve() {
+  mentionFields.forEach((input) => {
+    if (!input || input.dataset.mechanicMentionReady === '1') return;
+    input.dataset.mechanicMentionReady = '1';
+
+    ['change', 'blur'].forEach((eventName) => {
+      input.addEventListener(eventName, () => formatMentionField(input));
+    });
+  });
+
+  document.addEventListener('mechanics-mentions-updated', () => {
+    mentionFields.forEach(formatMentionField);
+    if (fields.output && fields.output.value && !fields.output.value.includes('سيظهر تقرير الإشراف')) {
+      generateSupervisionReport();
+    }
+  });
+}
+
+
+function initSupervisionCodeAutoResolveStrong() {
+  mentionFields.forEach((input) => {
+    if (!input || input.dataset.supervisionCodeReady === '1') return;
+    input.dataset.supervisionCodeReady = '1';
+
+    ['input', 'change', 'blur'].forEach((eventName) => {
+      input.addEventListener(eventName, () => {
+        if (eventName !== 'input') formatMentionField(input);
+      });
+    });
+  });
+
+  document.addEventListener('mechanics-mentions-updated', () => {
+    mentionFields.forEach(formatMentionField);
+    if (fields.output && fields.output.value && !fields.output.value.includes('سيظهر تقرير الإشراف')) {
+      generateSupervisionReport();
+    }
+  });
 }
 
 function initSupervisionButtons() {
@@ -501,6 +625,8 @@ window.fillExample = fillExample;
 window.clearFields = clearFields;
 
 function initSupervisionPage() {
+  initSupervisionCodeAutoResolveStrong();
+  initMechanicMentionAutoResolve();
   initSupervisionButtons();
   initAuditImagePreview();
 }

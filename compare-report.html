@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=recruitment-direction" />
+  <link rel="stylesheet" href="style.css?v=supervision-hard-code-fix" />
   <style>
     html, body { min-height: 100%; }
     .compare-page-shell {
@@ -22,8 +22,104 @@
       }
     }
   </style>
+
+  <style>
+    body.compare-fullscreen-page {
+      overflow-x: hidden;
+    }
+
+    body.compare-fullscreen-page .page-shell,
+    body.compare-fullscreen-page .page-shell.wide,
+    body.compare-fullscreen-page .compare-page-shell {
+      width: calc(100vw - 32px) !important;
+      max-width: none !important;
+      margin: 0 auto !important;
+      padding: 18px 0 32px !important;
+    }
+
+    body.compare-fullscreen-page .top-nav {
+      position: relative !important;
+      top: auto !important;
+      right: auto !important;
+      left: auto !important;
+      bottom: auto !important;
+      width: 100% !important;
+      height: auto !important;
+      min-height: 74px !important;
+      margin: 0 0 16px !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      overflow-x: auto !important;
+      border-left: 0 !important;
+      border: 1px solid rgba(217,154,43,0.35) !important;
+      border-radius: 18px !important;
+    }
+
+    body.compare-fullscreen-page .top-nav::before,
+    body.compare-fullscreen-page .top-nav::after {
+      display: none !important;
+    }
+
+    body.compare-fullscreen-page .top-nav a {
+      flex: 0 0 auto !important;
+      min-height: 50px !important;
+    }
+
+    body.compare-fullscreen-page .nav-session-box {
+      flex: 0 0 auto !important;
+      margin-top: 0 !important;
+      padding: 0 !important;
+      border: 0 !important;
+      background: transparent !important;
+    }
+
+    body.compare-fullscreen-page .nav-session-box span,
+    body.compare-fullscreen-page .nav-session-box strong {
+      display: none !important;
+    }
+
+    body.compare-fullscreen-page .compare-card,
+    body.compare-fullscreen-page .compare-full-card {
+      width: 100% !important;
+      max-width: none !important;
+      overflow: visible !important;
+    }
+
+    body.compare-fullscreen-page .compare-frame-wrap,
+    body.compare-fullscreen-page .compare-frame-full {
+      width: 100% !important;
+      height: calc(100vh - 260px) !important;
+      min-height: 720px !important;
+      overflow: auto !important;
+      border-radius: 14px !important;
+    }
+
+    body.compare-fullscreen-page .compare-frame-wrap iframe,
+    body.compare-fullscreen-page .compare-frame-full iframe {
+      width: 100% !important;
+      min-width: 1200px !important;
+      height: 100% !important;
+      border: 0 !important;
+      transform: none !important;
+    }
+
+    .compare-hint {
+      margin: 10px 0 14px;
+      color: rgba(255,255,255,0.70);
+      line-height: 1.8;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 900px) {
+      body.compare-fullscreen-page .compare-frame-wrap iframe,
+      body.compare-fullscreen-page .compare-frame-full iframe {
+        min-width: 1000px !important;
+      }
+    }
+  </style>
+
 </head>
-<body>
+<body class="compare-fullscreen-page">
   <main class="compare-page-shell">
     <nav class="top-nav card" aria-label="التنقل بين صفحات الموقع">
       <a href="index.html">توجيهات الميدان</a>
@@ -39,23 +135,72 @@
       </div>
     </nav>
 
-    <section class="card compare-full-card">
-      <div class="compare-toolbar">
-        <h1>مقارنة التقرير</h1>
-        <a class="compare-open-link" href="https://xhhp1.github.io/SOMTINGHNEW/" target="_blank" rel="noopener">فتح في صفحة مستقلة</a>
-      </div>
 
-      <div class="compare-frame-full">
-        <iframe
-          src="https://xhhp1.github.io/SOMTINGHNEW/"
-          title="مقارنة التقرير"
-          loading="eager"
-          referrerpolicy="no-referrer-when-downgrade"
-          allowfullscreen>
-        </iframe>
+    <section class="card mechanics-mention-helper">
+      <div class="compare-toolbar">
+        <h1>تحويل كود الميكانيك إلى منشن</h1>
+        <button id="refreshMechanicsSheetBtn" class="ghost" type="button">تحديث جدول الميكانيك</button>
+      </div>
+      <p class="section-note">جدول الميكانيك: <span data-mechanics-status>جاري قراءة جدول الميكانيك...</span></p>
+      <div class="grid two">
+        <div class="field">
+          <label for="compareMentionInput">الكود / الاسم / Copy ID</label>
+          <textarea id="compareMentionInput" rows="4" placeholder="مثال: G-109 أو سعيد البدواوي أو Copy ID"></textarea>
+        </div>
+        <div class="field">
+          <label for="compareMentionOutput">المنشن الناتج</label>
+          <textarea id="compareMentionOutput" rows="4" readonly>اكتب الكود أو الاسم أو Copy ID ثم اضغط تحويل.</textarea>
+        </div>
+      </div>
+      <div class="button-row">
+        <button id="convertCompareMentionBtn" class="primary" type="button">تحويل إلى منشن</button>
+        <button id="copyCompareMentionBtn" class="secondary" type="button">نسخ المنشن</button>
       </div>
     </section>
+
+    <section class="card compare-full-card local-report-compare">
+      <div class="compare-toolbar">
+        <h1>مقارنة التقرير بالأسماء</h1>
+        <button id="runLocalCompareBtn" class="primary" type="button">بدء المقارنة</button>
+      </div>
+      <p class="section-note">الصق تقرير المشرف وتقرير الفني، وسيتم عرض المنشنات المشتركة والناقصة بالأسماء من جدول الميكانيك بدلاً من الأرقام.</p>
+
+      <div class="grid two compare-input-grid">
+        <div class="field">
+          <label for="supervisorCompareInput">تقرير المشرف</label>
+          <textarea id="supervisorCompareInput" rows="12" placeholder="الصق تقرير المشرف هنا..."></textarea>
+        </div>
+        <div class="field">
+          <label for="technicianCompareInput">تقرير الفني</label>
+          <textarea id="technicianCompareInput" rows="12" placeholder="الصق تقرير الفني هنا..."></textarea>
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button id="runLocalCompareBtn2" class="primary" type="button">مقارنة التقرير</button>
+        <button id="clearLocalCompareBtn" class="secondary" type="button">مسح الحقول</button>
+      </div>
+
+      <div class="compare-results-grid">
+        <div class="compare-result-card shared">
+          <h2>المنشنات المشتركة ✅</h2>
+          <div id="sharedMentionsList" class="compare-name-list">لم يتم تشغيل المقارنة بعد.</div>
+        </div>
+        <div class="compare-result-card missing-supervisor">
+          <h2>موجودة في تقرير الفني فقط</h2>
+          <div id="technicianOnlyList" class="compare-name-list">لم يتم تشغيل المقارنة بعد.</div>
+        </div>
+        <div class="compare-result-card missing-technician">
+          <h2>موجودة في تقرير المشرف فقط</h2>
+          <div id="supervisorOnlyList" class="compare-name-list">لم يتم تشغيل المقارنة بعد.</div>
+        </div>
+      </div>
+    </section>
+
   </main>
-  <script src="auth.js?v=recruitment-direction"></script>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="mechanics-data.js?v=supervision-hard-code-fix"></script>
+  <script src="compare-mentions.js?v=supervision-hard-code-fix"></script>
+  <script src="auth.js?v=supervision-hard-code-fix"></script>
 </body>
 </html>

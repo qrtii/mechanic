@@ -63,6 +63,10 @@ function toTwelveHourTime(rawTime, fallback = '00:00') {
 
 
 function convertDiscordIdsToMentions(text) {
+  if (window.MechanicsMentions && typeof window.MechanicsMentions.resolve === 'function') {
+    return window.MechanicsMentions.resolve(text);
+  }
+
   const placeholders = [];
   let working = normalizeDigits(String(text || ''));
 
@@ -81,9 +85,17 @@ function convertDiscordIdsToMentions(text) {
   return working.trim();
 }
 
+
+function resolveMechanicCodeOrMention(text) {
+  if (window.MechanicsMentions && typeof window.MechanicsMentions.resolve === 'function') {
+    return window.MechanicsMentions.resolve(text);
+  }
+  return convertDiscordIdsToMentions(text);
+}
+
 function formatMentionField(input) {
   if (!input) return;
-  input.value = convertDiscordIdsToMentions(input.value);
+  input.value = resolveMechanicCodeOrMention(input.value);
 }
 
 const adminSupervisorMentionFields = [
