@@ -1841,3 +1841,7 @@ body.compare-fullscreen-page .compare-frame-full iframe {
 .compare-name-item.is-missing strong {
   color: #ffb4ac;
 }
+
+/* تخفيف تدقيق التقارير ومنع التعليق */
+.compare-empty { line-height: 1.8; }
+button:disabled { opacity: .65; cursor: wait !important; transform: none !important; }
