@@ -1810,3 +1810,34 @@ body.compare-fullscreen-page .compare-frame-full iframe {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* تحسين تدقيق مقارنة التقرير وإظهار الأسماء */
+.compare-name-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.copy-mention-mini {
+  min-height: 28px;
+  padding: 4px 9px;
+  border-radius: 7px;
+  font-size: 0.78rem;
+  color: #211506 !important;
+  background: linear-gradient(135deg, #f3c266, #d99a2b) !important;
+  box-shadow: none !important;
+}
+
+.compare-name-item.is-found {
+  border-color: rgba(40,199,111,0.22);
+}
+
+.compare-name-item.is-missing {
+  border-color: rgba(227,80,70,0.24);
+}
+
+.compare-name-item.is-missing strong {
+  color: #ffb4ac;
+}
